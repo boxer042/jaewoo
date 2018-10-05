@@ -26,7 +26,7 @@ const Category = db.define('category', {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   },
-},{
+}, {
   indexes: [
     {
       name: 'category_order_of_user',

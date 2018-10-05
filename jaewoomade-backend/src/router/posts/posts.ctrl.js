@@ -28,13 +28,8 @@ export const writePost = async (ctx: Context): Promise<*> => {
     isMarkdown: Joi.boolean().required(),
     isTemp: Joi.boolean().required(),
     meta: Joi.object(),
-<<<<<<< HEAD
     categories: Joi.array().items(Joi.string()).required(),
     tags: Joi.array().items(Joi.string()).required(),
-=======
-    categories: Joi.array().items(Joi.string()),
-    tags: Joi.array().items(Joi.string()),
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
   });
 
   if (!validateSchema(ctx, schema)) {
@@ -45,7 +40,6 @@ export const writePost = async (ctx: Context): Promise<*> => {
     title, body, shortDescription, thumbnail,
     isMarkdown, isTemp, meta, categories, tags,
   }: BodySchema = (ctx.request.body: any);
-<<<<<<< HEAD
 
   // 중복 값 하나만
   const uniqueTags: Array<string> = filterUnique(tags);
@@ -66,12 +60,6 @@ export const writePost = async (ctx: Context): Promise<*> => {
       }
     }
 
-=======
-  // 중복 값 하나만
-  const uniqueTags: Array<string> = filterUnique(tags);
-
-  try {
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
     const tagIds = await Promise.all(uniqueTags.map(tag => Tag.getId(tag)));
     // create Post data
     const post = await Post.build({
@@ -85,7 +73,6 @@ export const writePost = async (ctx: Context): Promise<*> => {
       meta_json: JSON.stringify(meta),
     }).save();
 
-<<<<<<< HEAD
     const postId = post.id;
     await PostsTags.link(postId, tagIds);
     await PostsCategories.link(postId, uniqueCategories);
@@ -97,14 +84,6 @@ export const writePost = async (ctx: Context): Promise<*> => {
       tags: uniqueTags,
       categories: categoriesInfo.map(({ id, name }) => ({ id, name })),
     };
-=======
-    ctx.body = {
-      ...post.toJSON(),
-    };
-
-    const postId = post.id;
-    await PostsTags.link(postId, tagIds);
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
   } catch (e) {
     ctx.throw(500, e);
   }

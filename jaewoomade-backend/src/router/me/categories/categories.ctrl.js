@@ -78,11 +78,7 @@ export const reorderCategories = async (ctx: Context): Promise<*> => {
 
   // check whether everything matches
   const match = (category) => {
-<<<<<<< HEAD
     if (categories === null) return false;
-=======
-    if (categories === null ) return false;
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
     const index = categoryOrders.findIndex(co => co.id === category.id);
     if (index === -1) return false;
     return true;
@@ -130,10 +126,6 @@ export const reorderCategories = async (ctx: Context): Promise<*> => {
   }
 
   ctx.body = categories.sort(sortCategoryOrder);
-<<<<<<< HEAD
-=======
-
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
 };
 
 // TODO: enhance to patchCategory (for urlSlug)

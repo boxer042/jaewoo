@@ -33,11 +33,7 @@ PostsTags.associate = function associate() {
 
 // links postId to tagIds
 PostsTags.link = function link(postId: string, tagIds: Array<string>): Promise<*> {
-<<<<<<< HEAD
   const promises = tagIds.map(tagId => PostsTags.build({
-=======
-  const promises = tagIds.map(tagId => PostsTags.build({ 
->>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
     fk_post_id: postId,
     fk_tag_id: tagId,
   }).save());
