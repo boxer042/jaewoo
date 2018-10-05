@@ -13,6 +13,9 @@
     flex: 1;
     display: flex;
     .CodeMirror {
+      .CodeMirror-lines {
+        padding-right: 1rem;
+      }
       flex: 1;
       height: auto;
       font-family: 'D2 coding';
