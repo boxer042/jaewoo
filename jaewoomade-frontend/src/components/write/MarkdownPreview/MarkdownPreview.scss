@@ -1,0 +1,17 @@
+@import 'utils';
+
+.MarkdownPreview {
+  position: relative;
+  font-size: 1.5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  width: 100%;
+  overflow-y: auto;
+  & > h1 {
+    padding-bottom: 1rem;
+    font-size: 3rem;
+    font-weight: 600;
+    border-bottom: 1px solid $oc-gray-4;
+    word-break: break-word;
+  }
+}
