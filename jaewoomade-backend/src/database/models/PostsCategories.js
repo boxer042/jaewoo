@@ -33,6 +33,7 @@ PostsCategories.associate = function associate() {
   });
 };
 
+<<<<<<< HEAD
 // links postId to categoryIds
 PostsCategories.link = function (postId: string, categoryIds: Array<string>): Promise<*> {
   const promises = categoryIds.map(categoryId => PostsCategories.build({
@@ -55,4 +56,6 @@ PostsCategories.findCategoriesByPostId = function (postId: string): Promise<*> {
     raw: true,
   });
 };
+=======
+>>>>>>> 322dd746f5b2136201f5ddf8cd05f72172dd1d86
 export default PostsCategories;
