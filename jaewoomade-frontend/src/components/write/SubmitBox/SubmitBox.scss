@@ -1,0 +1,13 @@
+@import 'utils';
+
+.SubmitBox {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  background: $oc-gray-7;
+  width: 20rem;
+  padding: 1.5rem;
+  z-index: z('submit-box');
+  @include material-shadow(2, 1);
+  color: white;
+}

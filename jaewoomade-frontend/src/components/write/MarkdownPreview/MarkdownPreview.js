@@ -10,7 +10,7 @@ type Props = {
 
 const MarkdownPreview = ({ title, body }: Props) => {
   return (
-    <div className="MarkdownPreview">
+    <div className="MarkdownPreview" id="preview">
     <h1>{title}</h1>
       <MarkdownRender body={body} />
     </div>

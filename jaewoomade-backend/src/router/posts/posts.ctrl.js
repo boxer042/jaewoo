@@ -2,9 +2,9 @@
 
 import type { Context } from 'koa';
 import Joi from 'joi';
-import { validateSchema, filterUnique } from 'lib/common';
+import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
 import { Category, Post, PostsCategories, PostsTags, Tag, User, UserProfile } from 'database/models';
-
+import shortid from 'shortid';
 import { type PostModel } from 'database/models/Post';
 
 export const writePost = async (ctx: Context): Promise<*> => {
@@ -30,6 +30,7 @@ export const writePost = async (ctx: Context): Promise<*> => {
     meta: Joi.object(),
     categories: Joi.array().items(Joi.string()).required(),
     tags: Joi.array().items(Joi.string()).required(),
+    urlSlug: Joi.string().max(130),
   });
 
   if (!validateSchema(ctx, schema)) {
@@ -38,8 +39,11 @@ export const writePost = async (ctx: Context): Promise<*> => {
 
   const {
     title, body, shortDescription, thumbnail,
-    isMarkdown, isTemp, meta, categories, tags,
+    isMarkdown, isTemp, meta, categories, tags, urlSlug,
   }: BodySchema = (ctx.request.body: any);
+
+  const generatedUrlSlug = `${title} ${generateSlugId()}`;
+  const escapedUrlSlug = escapeForUrl(urlSlug || generatedUrlSlug);
 
   // 중복 값 하나만
   const uniqueTags: Array<string> = filterUnique(tags);
@@ -71,6 +75,7 @@ export const writePost = async (ctx: Context): Promise<*> => {
       is_temp: isTemp,
       fk_user_id: ctx.user.id,
       meta_json: JSON.stringify(meta),
+      url_slug: escapedUrlSlug,
     }).save();
 
     const postId = post.id;
@@ -84,6 +89,27 @@ export const writePost = async (ctx: Context): Promise<*> => {
       tags: uniqueTags,
       categories: categoriesInfo.map(({ id, name }) => ({ id, name })),
     };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const readPost = async (ctx: Context): Promise<*> => {
+  try {
+    const posts = await Post.findAll({
+      attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
+      include: [{
+        model: User,
+        attributes: ['username'],
+        where: {
+          username,
+        },
+      } Tag, Category],
+      where: {
+        url_slug: urlSlug,
+      },
+    });
+    ctx.body = posts;
   } catch (e) {
     ctx.throw(500, e);
   }
