@@ -5,7 +5,8 @@ import Joi from 'joi';
 import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
 import { Category, Post, PostsCategories, PostsTags, Tag, User, UserProfile } from 'database/models';
 import shortid from 'shortid';
-import { type PostModel } from 'database/models/Post';
+import { serializePost, type PostModel } from 'database/models/Post';
+import Sequelize from 'sequelize';
 
 export const writePost = async (ctx: Context): Promise<*> => {
   type BodySchema = {
@@ -44,9 +45,10 @@ export const writePost = async (ctx: Context): Promise<*> => {
 
   const generatedUrlSlug = `${title} ${generateSlugId()}`;
   const escapedUrlSlug = escapeForUrl(urlSlug || generatedUrlSlug);
+  const replaceDashToSpace = text => text.replace(/-/g, ' ');
 
   // 중복 값 하나만
-  const uniqueTags: Array<string> = filterUnique(tags);
+  const uniqueTags: Array<string> = filterUnique(tags).map(replaceDashToSpace);
   const uniqueCategories: Array<string> = filterUnique(categories);
 
   try {
@@ -95,21 +97,37 @@ export const writePost = async (ctx: Context): Promise<*> => {
 };
 
 export const readPost = async (ctx: Context): Promise<*> => {
+  const { username, urlSlug } = ctx.params;
   try {
-    const posts = await Post.findAll({
-      attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
-      include: [{
-        model: User,
-        attributes: ['username'],
-        where: {
-          username,
-        },
-      } Tag, Category],
-      where: {
-        url_slug: urlSlug,
-      },
-    });
-    ctx.body = posts;
+    const post = await Post.readPost(username, urlSlug);
+    if (!post) {
+      ctx.status = 404;
+      return;
+    }
+    ctx.body = serializePost(post);
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const listPosts = async (ctx: Context): Promise<*> => {
+  const { username } = ctx.params;
+  const { category, tag, page } = ctx.query;
+
+  const query = {
+    username, categoryUrlSlug: category, tag, page: parseInt(page, 10),
+  };
+
+  try {
+    const result = await Post.listPosts(query);
+    if (!result.data) {
+      ctx.set('Page-Limit', '1');
+      ctx.body = [];
+      return;
+    }
+    ctx.body = result.data.map(serializePost);
+    ctx.set('Count', (result.count).toString());
+    ctx.set('Page-Limit', Math.ceil(result.count / 10).toString());
   } catch (e) {
     ctx.throw(500, e);
   }

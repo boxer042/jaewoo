@@ -1,7 +1,7 @@
 // @flow
 import Sequelize from 'sequelize';
 import db from 'database/db';
-import { User } from 'database/models';
+import { User, Tag, Category } from 'database/models';
 
 export type PostModel = {
   id: string,
@@ -40,6 +40,94 @@ const Post = db.define('post', {
 
 Post.associate = function associate() {
   Post.belongsTo(User, { foreignKey: 'fk_user_id', onDelete: 'restrict', onUpdate: 'restrict' });
+};
+
+Post.readPost = function (username: string, urlSlug: string) {
+  return Post.findOne({
+    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
+    include: [{
+      model: User,
+      attributes: ['username'],
+      where: {
+        username,
+      },
+    }, Tag, Category],
+    where: {
+      url_slug: urlSlug,
+    },
+  });
+};
+
+type PostsQueryInfo = {
+  username: ?string,
+  tag: ?string,
+  categoryUrlSlug: ?string,
+  page: ?number
+};
+
+Post.listPosts = async function ({
+  username,
+  categoryUrlSlug,
+  tag,
+  page
+}: PostsQueryInfo) {
+  // reusable query for COUNT & SELECT
+  const query = `
+    ${username ? 'JOIN users u ON p.fk_user_id = u.id' : ''}
+    ${tag ? `JOIN posts_tags pt ON p.id = pt.fk_post_id
+    JOIN tags t ON t.id = pt.fk_tag_id` : ''}
+    ${categoryUrlSlug ? `JOIN posts_categories pc ON p.id = pc.fk_post_id
+    JOIN categories c ON c.id = pc.fk_category_id` : ''}
+    WHERE true
+    ${username ? 'AND u.username = $username' : ''}
+    ${tag ? 'AND t.name = $tag' : ''}
+    ${categoryUrlSlug ? 'AND c.url_slug = $category' : ''}
+  `;
+
+  try {
+    const countResult = await db.query(`SELECT COUNT(DISTINCT p.id) as count FROM posts p ${query}`, { bind: { tag, username, category: categoryUrlSlug }, type: Sequelize.QueryTypes.SELECT });
+    const { count } = countResult[0];
+
+    if (!count) return { count: 0, data: null };
+
+    const rows = await db.query(`SELECT DISTINCT p.id, p.created_at FROM posts p
+      ${query}
+      ORDER BY created_at DESC
+      LIMIT 10
+      OFFSET ${((page || 1) - 1) * 10}
+    `, { bind: { tag, username, category: categoryUrlSlug }, type: Sequelize.QueryTypes.SELECT });
+    
+    if (rows.length === 0) return { count: 0, data: null };
+    const postIds = rows.map(({ id }) => id);
+
+    const fullPosts = await Post.findAll({
+      include: [User, Tag, Category],
+      where: {
+        id: {
+          $or: postIds,
+        },
+      },
+    });
+    return {
+      count,
+      data: fullPosts,
+    };
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const serializePost = (data: any) => {
+  const {
+    id, title, body, thumbnail, is_markdown, created_at,
+    updated_at, url_slug, likes, comments_count,
+  } = data;
+  const tags = data.tags.map(tag => tag.name);
+  const categories = data.categories.map(category => ({ id: category.id, name: category.name }));
+  return {
+    id, title, body, thumbnail, is_markdown,
+    created_at, updated_at, tags, categories, url_slug, likes, comments_count,
+  };
 };
 
 export default Post;
