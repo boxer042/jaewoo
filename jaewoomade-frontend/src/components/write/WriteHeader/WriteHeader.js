@@ -6,11 +6,13 @@ import './WriteHeader.scss';
 
 type Props = {
   onChangeTitle(e: any): void,
+  onOpenSubmitBox(): void,
   value: string,
   title: string,
 }
 const WriteHeader = ({
   onChangeTitle,
+  onOpenSubmitBox,
   title,
 }: Props) => {
   return (
@@ -28,7 +30,7 @@ const WriteHeader = ({
         <div className="button temp-save">
           임시저장
         </div>
-        <div className="button submit">
+        <div className="button submit" onClick={onOpenSubmitBox}>
           작성하기
         </div>
         <div className="more util flex-center">

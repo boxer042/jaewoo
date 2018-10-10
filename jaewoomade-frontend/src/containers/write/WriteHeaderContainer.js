@@ -16,11 +16,20 @@ class WriteHeaderContainer extends Component<Props> {
     });
   }
 
+  onOpenSubmitBox = () => {
+    WriteActions.openSubmitBox();
+  };
+
+  onCloseSubmitBox = () => {
+    WriteActions.closeSubmitBox();
+  }
+
   render() {
-    const { onChangeTitle } = this;
+    const { onChangeTitle, onOpenSubmitBox } = this;
     const { title } = this.props;
     return (
       <WriteHeader
+        onOpenSubmitBox={onOpenSubmitBox}
         onChangeTitle={onChangeTitle}
         title={title}
       />

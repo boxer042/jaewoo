@@ -113,7 +113,7 @@ class CodeEditor extends Component<Props, State> {
       lineNumbers: false, // 좌측에 라인넘버 띄우기
       lineWrapping: true, // 내용이 너무 길면 다음 줄에 작성
       scrollbarStyle: 'overlay',
-      placeholder: '당신의 이야기를 적어보세요...',
+      placeholder: '작성해주세요.',
     });
     this.codeMirror.on('change', this.onChange);
     this.codeMirror.on('scroll', this.onScroll);
