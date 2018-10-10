@@ -1,6 +1,6 @@
 // @flow
 import { createAction, handleActions } from 'redux-actions';
-import { Record, fromJS, type Map } from 'immutable';
+import { Record, List, type Map } from 'immutable';
 import { pender } from 'redux-pender';
 import * as AuthAPI from 'lib/api/auth';
 

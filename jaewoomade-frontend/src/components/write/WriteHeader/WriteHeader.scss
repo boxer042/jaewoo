@@ -1,6 +1,8 @@
 @import 'utils';
 
 .WriteHeader {
+  position: relative;
+  z-index: z('write-header');
   height: 4rem;
   background: $oc-gray-8;
   padding-left: 1rem;
@@ -11,7 +13,7 @@
   .back-icon {
     cursor: pointer;
     color: rgba(255,255,255,0.8);
-    font-size: 2rem;
+    font-size: 1.75rem;
     &:hover, &:active {
       color: white;
     }
@@ -38,7 +40,7 @@
     align-items: center;
 
     .button {
-      background: $oc-gray-8;
+      background: $oc-gray-0;
       padding: 0.6rem;
       font-weight: 500;
       border-radius: 2px;
@@ -61,7 +63,7 @@
           background: darken(#65707b, 5%);
         }
       }
-
+      
       &.submit {
         background: $oc-violet-5;
         color: white;
@@ -70,6 +72,17 @@
         }
         &:active {
           background: $oc-violet-5;
+        }
+      }
+
+      &.edit {
+        background: $oc-indigo-6;
+        color: white;
+        &:hover {
+          background: lighten($oc-indigo-6, 5%);
+        }
+        &:active {
+          background: $oc-indigo-6;
         }
       }
     }

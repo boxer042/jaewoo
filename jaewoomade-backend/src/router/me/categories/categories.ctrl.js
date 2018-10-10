@@ -31,7 +31,7 @@ export const createCategory = async (ctx: Context): Promise<*> => {
   });
 
   if (!validateSchema(ctx, schema)) return;
-  
+
   const { name, urlSlug }: BodySchema = (ctx.request.body: any);
   const { id: userId } = ctx.user;
 

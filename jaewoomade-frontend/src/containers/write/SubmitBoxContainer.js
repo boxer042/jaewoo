@@ -5,24 +5,37 @@ import SelectCategory from 'components/write/SelectCategory';
 import InputTags from 'components/write/InputTags';
 import { connect } from 'react-redux';
 import type { State } from 'store';
-import { WriteActions } from 'store/actionCreators';
-
+import { WriteActions, UserActions } from 'store/actionCreators';
+import type { Categories } from 'store/modules/write';
 
 type Props = {
   open: boolean,
+  categories: ?Categories,
 }
 
 class SubmitBoxContainer extends Component<Props> {
+  initialize = async () => {
+    try {
+      await WriteActions.listCategories();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  componentDidMount() {
+    this.initialize();
+  }
+
   onClose = () => {
     WriteActions.closeSubmitBox();
   }
 
   render() {
     const { onClose } = this;
-    const { open } = this.props;
+    const { open, categories } = this.props;
     return (
       <SubmitBox
-        selectCategory={<SelectCategory />}
+        selectCategory={<SelectCategory categories={categories} />}
         inputTags={<InputTags tags={['내가', '좋아하는']} />}
         visible={open}
         onClose={onClose}
@@ -34,6 +47,7 @@ class SubmitBoxContainer extends Component<Props> {
 export default connect(
   ({ write }: State) => ({
     open: write.submitBox.open,
+    categories: write.categories,
   }),
   () => ({}),
 )(SubmitBoxContainer);

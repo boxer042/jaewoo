@@ -2,6 +2,7 @@
 import React from 'react';
 import cx from 'classnames';
 import CheckIcon from 'react-icons/lib/md/check';
+import type { Categories } from 'store/modules/write';
 import './SelectCategory.scss';
 
 type CategoryProps = {
@@ -22,18 +23,21 @@ Category.defaultProps = {
 };
 
 type Props = {
-  categories: Array<*>
+  categories: ?Categories
 };
 
-const SelectCategory = () => {
+const SelectCategory = ({ categories }: Props) => {
+  if (!categories || categories.size === 0) {
+    return null;
+  }
+
+  const categoryList = categories.map(
+    category => (
+      <Category key={category.id} name={category.name} id={category.id} active={category.active} />
+    ));
   return (
     <div className="SelectCategory">
-      <Category name="hello" id="1" active />
-      <Category name="hello" id="2" />
-      <Category name="hello" id="3" />
-      <Category name="hello" id="4" />
-      <Category name="hello" id="5" />
-      <Category name="hello" id="6" />
+      {categoryList}
     </div>
   );
 };

@@ -13,11 +13,22 @@ type Props = {
   inputTags: any,
   visible: boolean,
   onClose(): void,
+  categories: ?Categories,
 };
 
-class SubmitBox extends Component<Props> {
+type State = {
+  animating: boolean,
+};
+
+class SubmitBox extends Component<Props, State> {
+  animateTimeout: any;
+
   static defaultProps ={
     isEditing: false,
+  }
+
+  state = {
+    animating: false,
   }
 
   handleClickOutside = () => {
@@ -25,13 +36,35 @@ class SubmitBox extends Component<Props> {
     onClose();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.visible && !nextProps.visible) {
+      this.animate();
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.this.animateTimeout);
+  }
+
+  animate = () => {
+    clearTimeout(this.animateTimeout);
+    this.setState({
+      animating: true,
+    });
+    this.animateTimeout = setTimeout(() => {
+      this.setState({
+        animating: false,
+      });
+    }, 150);
+  }
+
   render() {
     const { isEditing, selectCategory, inputTags, visible } = this.props;
-
-    if (!visible) return null;
+    const { animating } = this.state;
+    if (!visible && !animating) return null;
 
     return (
-      <div className="SubmitBox">
+      <div className={cx('SubmitBox', visible ? 'appear' : 'disappear')}>
         <div className="title">
           {isEditing ? '수정하기' : '새 글 작성하기'}
         </div>
