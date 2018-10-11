@@ -7,10 +7,14 @@ import { connect } from 'react-redux';
 import type { State } from 'store';
 import { WriteActions, UserActions } from 'store/actionCreators';
 import type { Categories } from 'store/modules/write';
+import type { List } from 'immutable';
 
 type Props = {
   open: boolean,
   categories: ?Categories,
+  tags: List<string>,
+  title: string,
+  body: string,
 }
 
 class SubmitBoxContainer extends Component<Props> {
@@ -21,24 +25,58 @@ class SubmitBoxContainer extends Component<Props> {
       console.log(e);
     }
   }
-
   componentDidMount() {
     this.initialize();
   }
-
+  onInsertTag = (tag) => {
+    const { tags } = this.props;
+    const processedTag = tag.trim();
+    if (processedTag === '') return;
+    if (tags.indexOf(tag) !== -1) return;
+    WriteActions.insertTag(tag);
+  }
+  onRemoveTag = (tag) => {
+    WriteActions.removeTag(tag);
+  }
   onClose = () => {
     WriteActions.closeSubmitBox();
   }
+  onToggleCategory = (id) => {
+    WriteActions.toggleCategory(id);
+  }
+  onSubmit = async () => {
+    const { categories, tags, title, body } = this.props;
+
+    // console.log({
+    //   title,
+    //   body,
+    //   categories: categories ? categories.filter(c => c.active).map(c => c.id).toJS() : [],
+    //   tags: tags.toJS(),
+    // });
+    try {
+      await WriteActions.writePost({
+        title,
+        body,
+        isMarkdown: true,
+        isTemp: false,
+        tags: tags.toJS(),
+        categories: categories ? categories.filter(c => c.active).map(c => c.id).toJS() : [],
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   render() {
-    const { onClose } = this;
-    const { open, categories } = this.props;
+    const { onClose, onToggleCategory, onInsertTag, onRemoveTag, onSubmit } = this;
+    const { open, categories, tags } = this.props;
     return (
       <SubmitBox
-        selectCategory={<SelectCategory categories={categories} />}
-        inputTags={<InputTags tags={['내가', '좋아하는']} />}
+        selectCategory={<SelectCategory categories={categories} onToggle={onToggleCategory} />}
+        inputTags={<InputTags tags={tags} onInsert={onInsertTag} onRemove={onRemoveTag} />}
         visible={open}
         onClose={onClose}
+        onSubmit={onSubmit}
       />
     );
   }
@@ -47,7 +85,10 @@ class SubmitBoxContainer extends Component<Props> {
 export default connect(
   ({ write }: State) => ({
     open: write.submitBox.open,
-    categories: write.categories,
+    categories: write.submitBox.categories,
+    tags: write.submitBox.tags,
+    body: write.body,
+    title: write.title,
   }),
   () => ({}),
 )(SubmitBoxContainer);

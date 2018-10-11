@@ -2,11 +2,15 @@
 import React, { Component } from 'react';
 import uniqBy from 'lodash/uniqBy';
 import RemoveIcon from 'react-icons/lib/md/remove-circle';
-
+import PerfectScrollbar from 'perfect-scrollbar';
+import type { List } from 'immutable';
 import './InputTags.scss';
 
+
 type Props = {
-  tags: string,
+  tags: List<string>,
+  onInsert(string): void,
+  onRemove(string): void,
 };
 
 type State = {
@@ -16,13 +20,15 @@ type State = {
 const Tag = ({ name, onRemove }) => (
   <div className="tag">
     <div className="text">{name}</div>
-    <div className="remove" onClick={onRemove}>
+    <div className="remove" onClick={() => onRemove(name)}>
     <RemoveIcon />
     </div>
   </div>
 );
 
 class InputTags extends Component<Props, State> {
+  tags: any = null;
+
   static defaultProps = {
     tags: ['태그1', '태그2', '태그3'],
   };
@@ -46,7 +52,8 @@ class InputTags extends Component<Props, State> {
 
   onButtonClick = () => {
     const { input } = this.state;
-    const tags = input.split(',');
+    const { onInsert } = this.props;
+    onInsert(input.replace(',', ''));
     this.setState({
       input: '',
     });
@@ -56,6 +63,11 @@ class InputTags extends Component<Props, State> {
     const { tags, onRemove } = this.props;
     return tags.map(tag => (<Tag key={tag} name={tag} onRemove={onRemove} />));
   }
+
+  componentDidMount() {
+    const ps = new PerfectScrollbar(this.tags);
+  }
+
 
   render() {
     const { onChange, onButtonClick, onKeyUp } = this;

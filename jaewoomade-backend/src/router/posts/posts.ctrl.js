@@ -18,7 +18,8 @@ export const writePost = async (ctx: Context): Promise<*> => {
     isTemp: boolean,
     meta: any,
     categories: Array<string>,
-    tags: Array<string>
+    tags: Array<string>,
+    urlSlug: string,
   };
 
   const schema = Joi.object().keys({
@@ -84,13 +85,10 @@ export const writePost = async (ctx: Context): Promise<*> => {
     await PostsTags.link(postId, tagIds);
     await PostsCategories.link(postId, uniqueCategories);
 
-    const categoriesInfo = await PostsCategories.findCategoriesByPostId(postId);
+    const postData = await Post.readPostById(postId);
+    const serialized = serializePost(postData);
 
-    ctx.body = {
-      ...post.toJSON(),
-      tags: uniqueTags,
-      categories: categoriesInfo.map(({ id, name }) => ({ id, name })),
-    };
+    ctx.body = serialized;
   } catch (e) {
     ctx.throw(500, e);
   }

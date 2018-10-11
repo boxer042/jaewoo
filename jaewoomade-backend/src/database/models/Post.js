@@ -58,6 +58,19 @@ Post.readPost = function (username: string, urlSlug: string) {
   });
 };
 
+Post.readPostById = function (id) {
+  return Post.findOne({
+    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
+    include: [{
+      model: User,
+      attributes: ['username'],
+    }, Tag, Category],
+    where: {
+      id,
+    },
+  });
+};
+
 type PostsQueryInfo = {
   username: ?string,
   tag: ?string,

@@ -8,6 +8,7 @@ import {
   PostsCategories,
   Tag,
   PostsTags,
+  PostLike,
 } from './models';
 
 export function asscociate() {
@@ -18,6 +19,7 @@ export function asscociate() {
   Category.associate();
   PostsCategories.associate();
   PostsTags.associate();
+  PostLike.associate();
 }
 
 export default function sync() {
@@ -31,4 +33,5 @@ export default function sync() {
   PostsCategories.sync();
   Tag.sync();
   PostsTags.sync();
+  PostLike.sync();
 }

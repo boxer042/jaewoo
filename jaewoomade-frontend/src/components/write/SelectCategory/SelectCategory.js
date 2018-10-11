@@ -9,10 +9,11 @@ type CategoryProps = {
   id: string,
   name: string,
   active?: boolean,
+  onToggle(id: string): void,
 };
 
-const Category = ({ id, name, active }: CategoryProps) => (
-  <div className={cx('category', { active })}>
+const Category = ({ id, name, active, onToggle }: CategoryProps) => (
+  <div className={cx('category', { active })} onClick={() => onToggle(id)}>
     <div className="text">{name}</div>
     <CheckIcon />
   </div>
@@ -23,17 +24,24 @@ Category.defaultProps = {
 };
 
 type Props = {
-  categories: ?Categories
+  categories: ?Categories,
+  onToggle(id: string): void,
 };
 
-const SelectCategory = ({ categories }: Props) => {
+const SelectCategory = ({ categories, onToggle }: Props) => {
   if (!categories || categories.size === 0) {
     return null;
   }
 
   const categoryList = categories.map(
     category => (
-      <Category key={category.id} name={category.name} id={category.id} active={category.active} />
+      <Category
+        onToggle={onToggle}
+        key={category.id}
+        name={category.name}
+        id={category.id}
+        active={category.active}
+      />
     ));
   return (
     <div className="SelectCategory">

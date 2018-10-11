@@ -14,6 +14,7 @@ type Props = {
   visible: boolean,
   onClose(): void,
   categories: ?Categories,
+  onSubmit(): void,
 };
 
 type State = {
@@ -59,7 +60,7 @@ class SubmitBox extends Component<Props, State> {
   }
 
   render() {
-    const { isEditing, selectCategory, inputTags, visible } = this.props;
+    const { isEditing, selectCategory, inputTags, visible, onSubmit } = this.props;
     const { animating } = this.state;
     if (!visible && !animating) return null;
 
@@ -86,7 +87,7 @@ class SubmitBox extends Component<Props, State> {
           <div className="open-options">
             <span>추가설정</span>
           </div>
-          <div className="submit-button util flex-center">
+          <div className="submit-button util flex-center" onClick={onSubmit}>
             작성하기
           </div>
         </div>
