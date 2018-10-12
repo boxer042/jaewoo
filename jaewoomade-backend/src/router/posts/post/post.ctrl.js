@@ -14,11 +14,11 @@ export const checkPostExistancy = async (ctx: Context, next: () => Promise<*>): 
     const post = await Post.findById(id);
     if (!post) {
       ctx.status = 404;
-      return
+      return;
     }
     ctx.post = post;
   } catch (e) {
-    ctx.throw (e, 500);
+    ctx.throw(e, 500);
   }
   return next();
 };
@@ -86,7 +86,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
 
   const urlSlugShouldChange = urlSlug !== ctx.post.url_slug
     || (title && (ctx.post.title !== title));
-  
+
   // current !== received -> check urlSlugExistancy
   if (urlSlugShouldChange) {
     const exists = await Post.chekUrlSlugExistancy({
@@ -107,14 +107,14 @@ export const updatePost = async (ctx: Context): Promise<*> => {
       url_slug: urlSlugShouldChange && escapedUrlSlug,
       thumbnail,
       is_temp: isTemp,
-  }
+  };
 
   Object.keys(updateQuery).forEach((key) => {
     if (!updateQuery[key]) {
       delete updateQuery[key];
     }
   });
-  
+
   // Update Tags
   if (tags) {
     // check which tags to remove to add
@@ -157,7 +157,7 @@ export const readPost = async (ctx: Context): Promise<*> => {
 export const likePost = async (ctx: Context): Promise<*> => {
   const { id } = ctx.params;
   const { id: userId } = ctx.user;
-  
+
   try {
     const exists = await PostLike.checkExists({
       userId,
@@ -187,7 +187,7 @@ export const likePost = async (ctx: Context): Promise<*> => {
 export const unlikePost = async (ctx: Context): Promise<*> => {
   const { id } = ctx.params;
   const { id: userId } = ctx.user;
-  
+
   try {
     const exists = await PostLike.checkExists({
       userId,

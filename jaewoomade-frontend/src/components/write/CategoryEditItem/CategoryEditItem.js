@@ -9,6 +9,8 @@ type Props = {
   edit?: boolean,
   name: string,
   temp?: boolean,
+  onToggleEditCategory(): void,
+  onChange(e: SyntheticInputEvent<HTMLInputElement>): any;
 }
 
 const defaultProps = {
@@ -31,11 +33,11 @@ const DefaultItem = ({ name }: Props) => {
 
 DefaultItem.defaultProps = defaultProps;
 
-const EditingItem = ({ edit, temp, name }: Props) => {
+const EditingItem = ({ edit, temp, name, onToggleEditCategory, onChange }: Props) => {
   return (
     <Fragment>
-      <input plasceholdr="새 카테고리" />
-      <div className="apply-button">
+      <input placeholder="새 카테고리" autoFocus onChange={onChange} value={name} />
+      <div className="apply-button" onClick={onToggleEditCategory}>
         적용
       </div>
     </Fragment>

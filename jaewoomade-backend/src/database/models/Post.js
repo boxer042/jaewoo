@@ -37,7 +37,7 @@ const Post = db.define('post', {
 }, {
     indexes: [
       {
-        field: ['url_slug',]
+        field: ['url_slug'],
       },
     ],
   });
@@ -86,7 +86,7 @@ Post.listPosts = async function ({
   username,
   categoryUrlSlug,
   tag,
-  page
+  page,
 }: PostsQueryInfo) {
   // reusable query for COUNT & SELECT
   const query = `
@@ -113,7 +113,7 @@ Post.listPosts = async function ({
       LIMIT 10
       OFFSET ${((page || 1) - 1) * 10}
     `, { bind: { tag, username, category: categoryUrlSlug }, type: Sequelize.QueryTypes.SELECT });
-    
+
     if (rows.length === 0) return { count: 0, data: null };
     const postIds = rows.map(({ id }) => id);
 
