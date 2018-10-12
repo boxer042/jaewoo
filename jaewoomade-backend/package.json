@@ -38,6 +38,7 @@
     "github": "13.1.0",
     "googleapis": "23.0.0",
     "joi": "^13.1.2",
+    "json-diff": "^0.5.3",
     "jsonwebtoken": "^8.2.1",
     "koa": "^2.5.0",
     "koa-bodyparser": "^4.2.0",

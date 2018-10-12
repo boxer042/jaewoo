@@ -44,6 +44,10 @@ class SubmitBoxContainer extends Component<Props> {
   onToggleCategory = (id) => {
     WriteActions.toggleCategory(id);
   }
+  onEditCategoryClick = () => {
+    WriteActions.openCategoryModal();
+    WriteActions.closeSubmitBox();
+  }
   onSubmit = async () => {
     const { categories, tags, title, body } = this.props;
 
@@ -68,10 +72,14 @@ class SubmitBoxContainer extends Component<Props> {
   }
 
   render() {
-    const { onClose, onToggleCategory, onInsertTag, onRemoveTag, onSubmit } = this;
+    const {
+      onClose, onToggleCategory, onInsertTag, onRemoveTag,
+      onSubmit, onEditCategoryClick,
+    } = this;
     const { open, categories, tags } = this.props;
     return (
       <SubmitBox
+        onEditCategoryClick={onEditCategoryClick}
         selectCategory={<SelectCategory categories={categories} onToggle={onToggleCategory} />}
         inputTags={<InputTags tags={tags} onInsert={onInsertTag} onRemove={onRemoveTag} />}
         visible={open}

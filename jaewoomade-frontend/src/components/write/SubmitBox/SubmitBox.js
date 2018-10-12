@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import onClickOutside from 'react-onclickoutside';
 import SettingsIcon from 'react-icons/lib/md/settings';
-
 import cx from 'classnames';
 
 import './SubmitBox.scss';
@@ -15,6 +14,7 @@ type Props = {
   onClose(): void,
   categories: ?Categories,
   onSubmit(): void,
+  onEditCategoryClick(): void,
 };
 
 type State = {
@@ -33,7 +33,8 @@ class SubmitBox extends Component<Props, State> {
   }
 
   handleClickOutside = () => {
-    const { onClose } = this.props;
+    const { onClose, visible } = this.props;
+    if (!visible) return;
     onClose();
   }
 
@@ -60,7 +61,10 @@ class SubmitBox extends Component<Props, State> {
   }
 
   render() {
-    const { isEditing, selectCategory, inputTags, visible, onSubmit } = this.props;
+    const {
+      isEditing, selectCategory, inputTags, visible,
+      onSubmit, onEditCategoryClick,
+    } = this.props;
     const { animating } = this.state;
     if (!visible && !animating) return null;
 
@@ -71,8 +75,12 @@ class SubmitBox extends Component<Props, State> {
         </div>
         <div className="sections">
           <section>
-            <div className="section-title">
+            <div className="section-title category" onClick={onEditCategoryClick}>
               카테고리 선택
+              <div className="edit util flex-center">
+                <SettingsIcon />
+                <div>수정</div>
+              </div>
             </div>
             {selectCategory}
           </section>

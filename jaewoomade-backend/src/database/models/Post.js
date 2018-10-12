@@ -30,6 +30,10 @@ const Post = db.define('post', {
   fk_user_id: Sequelize.UUID,
   original_post_id: Sequelize.UUID,
   url_slug: Sequelize.STRING,
+  likes: {
+    defaultValue: 0,
+    type: Sequelize.INTEGER,
+  },
 }, {
     indexes: [
       {
@@ -44,7 +48,7 @@ Post.associate = function associate() {
 
 Post.readPost = function (username: string, urlSlug: string) {
   return Post.findOne({
-    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
+    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes'],
     include: [{
       model: User,
       attributes: ['username'],
@@ -60,7 +64,7 @@ Post.readPost = function (username: string, urlSlug: string) {
 
 Post.readPostById = function (id) {
   return Post.findOne({
-    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug'],
+    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes'],
     include: [{
       model: User,
       attributes: ['username'],
@@ -128,6 +132,39 @@ Post.listPosts = async function ({
   } catch (e) {
     throw e;
   }
+};
+
+Post.chekUrlSlugExistancy = function ({
+  userId,
+  urlSlug,
+}) {
+  return Post.count({
+    where: {
+      fk_user_id: userId,
+      url_slug: urlSlug,
+    },
+  });
+};
+
+Post.prototype.like = async function like(): Promise<*> {
+  return this.increment('likes', { by: 1 });
+};
+
+Post.prototype.unlike = async function like(): Promise<*> {
+  return this.decrement('likes', { by: 1 });
+};
+
+Post.prototype.getTagNames = async function (): Promise<*> {
+  const { id } = this;
+  return Post.find({
+    include: [{
+      model: Tag,
+      attributes: ['name'],
+    }],
+    where: {
+      id,
+    },
+  });
 };
 
 export const serializePost = (data: any) => {
