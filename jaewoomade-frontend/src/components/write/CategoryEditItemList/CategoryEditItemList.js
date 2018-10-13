@@ -11,12 +11,19 @@ type Props = {
   categories: ?Categories,
   onCreate(): void,
   onToggleEditCategory(id: string): void,
-  onChange({ id: string, name: string }): void
+  onChange({ id: string, name: string }): void,
+  onHideCategory(id: string): void,
 }
 
-const CategoryEditItemList = ({ categories, onCreate, onToggleEditCategory, onChange }: Props) => {
+const CategoryEditItemList = ({
+  categories,
+  onCreate,
+  onToggleEditCategory,
+  onChange,
+  onHideCategory,
+}: Props) => {
   if (!categories) return null;
-  const categoryList = categories.map(
+  const categoryList = categories.filter(c => !c.hide).map(
     category => (
       <CategoryEditItem
         key={category.id}
@@ -28,6 +35,7 @@ const CategoryEditItemList = ({ categories, onCreate, onToggleEditCategory, onCh
           id: category.id,
           name: e.target.value,
         })}
+        onHide={() => onHideCategory(category.id)}
       />
     ),
   );

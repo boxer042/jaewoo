@@ -10,7 +10,8 @@ type Props = {
   name: string,
   temp?: boolean,
   onToggleEditCategory(): void,
-  onChange(e: SyntheticInputEvent<HTMLInputElement>): any;
+  onChange(e: SyntheticInputEvent<HTMLInputElement>): any,
+  onHide(): void,
 }
 
 const defaultProps = {
@@ -19,13 +20,13 @@ const defaultProps = {
   name: '카테고리',
 };
 
-const DefaultItem = ({ name }: Props) => {
+const DefaultItem = ({ name, onHide, onToggleEditCategory }: Props) => {
   return (
     <Fragment>
       <div className="text">{name}</div>
       <div className="buttons">
-        <div className="button edit"><EditIcon /></div>
-        <div className="button remove"><RemoveIcon /></div>
+        <div className="button edit" onClick={onToggleEditCategory}><EditIcon /></div>
+        <div className="button remove" onClick={onHide}><RemoveIcon /></div>
       </div>
     </Fragment>
   );

@@ -5,7 +5,7 @@ import db from 'database/db';
 import Joi from 'joi';
 import { validateSchema, generateSlugId, escapeForUrl, extractKeys } from 'lib/common';
 import { diff } from 'json-diff';
-import { Post, PostLike, PostsTags } from 'database/models';
+import { Post, PostLike, PostsTags, Category, PostsCategories } from 'database/models';
 
 export const checkPostExistancy = async (ctx: Context, next: () => Promise<*>): Promise<*> => {
   const { id } = ctx.params;
@@ -132,6 +132,40 @@ export const updatePost = async (ctx: Context): Promise<*> => {
       ctx.throw(e);
     }
   }
+
+  // Update Categories
+  if (categories) {
+    try {
+      // Verify categories
+      const count = await Category.count({
+        where: {
+          id: {
+            $or: categories,
+          },
+          fk_user_id: ctx.user.id,
+        },
+      });
+      if (count !== categories.length) {
+        ctx.status = 409;
+        ctx.body = {
+          name: 'NOT_OWN_CATEGORY',
+        };
+        return;
+      }
+
+      // check which categories to remove or add
+      const currentCategories = await ctx.post.getCategoryIds();
+      const categoryDiff = diff(currentCategories.sort(), categories.sort()) || [];
+      const categoriesToRemove = categoryDiff.filter(info => info[0] === '-').map(info => info[1]);
+      const categoriesToAdd = categoryDiff.filter(info => info[0] === '+').map(info => info[1]);
+
+      await PostsCategories.removeCategoriesFromPost(id, categoriesToRemove);
+      await PostsCategories.addCategoriesToPost(id, categoriesToAdd);
+    } catch (e) {
+      ctx.throw(e);
+    }
+  }
+
 
   try {
     await ctx.post.update(updateQuery);

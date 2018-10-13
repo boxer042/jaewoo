@@ -18,6 +18,7 @@ const CLOSE_CATEGORY_MODAL = 'write/CLOSE_CATEGORY_MODAL';
 const CREATE_TEMP_CATEGORY = 'write/CREATE_TEMP_CATEGORY';
 const TOGGLE_EDIT_CATEGORY = 'write/TOGGLE_EDIT_CATEGORY';
 const CHANGE_CATEGORY_NAME = 'write/CHANGE_CATEGORY_NAME';
+const HIDE_CATEGORY = 'write/HIDE_CATEGORY';
 
 let tempCategoryId = 0;
 
@@ -35,6 +36,7 @@ export type WriteActionCreators = {
   createTempCategory(): any,
   toggleEditCategory(id: string): any,
   changeCategoryName({ id:string, name: string }): any,
+  hideCategory(id: string): any,
 }
 
 export const actionCreators = {
@@ -51,6 +53,7 @@ export const actionCreators = {
   createTempCategory: createAction(CREATE_TEMP_CATEGORY),
   toggleEditCategory: createAction(TOGGLE_EDIT_CATEGORY, id => id),
   changeCategoryName: createAction(CHANGE_CATEGORY_NAME, ({ id, name }) => ({ id, name })),
+  hideCategory: createAction(HIDE_CATEGORY, id => id),
 };
 
 export type Category = {
@@ -110,6 +113,7 @@ const CategorySubrecord = Record({
   active: false,
   edit: false,
   temp: false,
+  hide: false,
 });
 
 const SubmitBoxSubrecord = Record({
@@ -199,6 +203,15 @@ export default handleActions({
     return state.setIn(
       ['categoryModal', 'categories', index, 'name'],
       name,
+    );
+  },
+  [HIDE_CATEGORY]: (state, { payload: id }) => {
+    const index = state.categoryModal.categories.findIndex(
+      c => c.id === id,
+    );
+    return state.setIn(
+      ['categoryModal', 'categories', index, 'hide'],
+      true,
     );
   },
 }, initialState);
