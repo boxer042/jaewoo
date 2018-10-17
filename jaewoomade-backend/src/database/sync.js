@@ -9,9 +9,10 @@ import {
   Tag,
   PostsTags,
   PostLike,
+  Comment,
 } from './models';
 
-export function asscociate() {
+export function associate() {
   // configure relations
   UserProfile.associate();
   SocialAccount.associate();
@@ -20,10 +21,11 @@ export function asscociate() {
   PostsCategories.associate();
   PostsTags.associate();
   PostLike.associate();
+  Comment.associate();
 }
 
 export default function sync() {
-  asscociate();
+  associate();
   User.sync();
   UserProfile.sync();
   SocialAccount.sync();
@@ -34,4 +36,5 @@ export default function sync() {
   Tag.sync();
   PostsTags.sync();
   PostLike.sync();
+  Comment.sync();
 }

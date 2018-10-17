@@ -1,0 +1,87 @@
+// @flow
+import Joi from 'joi';
+import type { Context, Middleware } from 'koa';
+import db from 'database/db';
+import Comment, { type WriteParams } from 'database/models/Comment';
+import { validateSchema } from 'lib/common';
+
+export const writeComment: Middleware = async (ctx: Context) => {
+  type BodySchema = {
+    text: string,
+    reply_to: string
+  };
+
+  const schema = Joi.object().keys({
+    text: Joi.string().min(1).max(1000).required(),
+    reply_to: Joi.string().uuid(),
+  })
+
+  if (!validateSchema(ctx, schema)) {
+    return;
+  }
+
+  const {
+    text,
+    reply_to: replyTo,
+  }: BodySchema = (ctx.request.body: any);
+
+  // if user is replying to anoter commnet,
+  let level = 0;
+  let processedReplyTo = replyTo;
+  if (replyTo) {
+    // check that it exists
+    try {
+      const c = await Comment.findById(replyTo);
+      if (!c) {
+        ctx.status = 404;
+        ctx.body = {
+          name: 'COMMENT_NOT_FOUND',
+        };
+        return;
+      }
+      level = c.level + 1;
+      if (level === 4) {
+        level = 3; // downgrade
+        processedReplyTo = c.reply_to;
+      } else {
+        processedReplyTo = replyTo;
+        c.has_reply = true;
+      }
+      await c.update({
+        has_replies: true,
+      });
+    } catch (e) {
+      ctx.throw(500, e);
+    }
+  }
+
+  const postId = ctx.post.id;
+  const userId = ctx.user.id;
+
+  try {
+    const comment = await Comment.write({
+      postId, userId, text, replyTo: processedReplyTo, level,
+    });
+    if (!comment) {
+      ctx.status = 500;
+    }
+    const commentWithUsername = await Comment.readComment(comment.id);
+    ctx.body = commentWithUsername;
+  } catch (e) {
+    ctx.throw(e);
+  }
+};
+
+export const getCommentList: Middleware = async (ctx: Context) => {
+  const postId = ctx.post.id;
+  const { offset = 0 } = ctx.query;
+  try {
+    const { data, count } = await Comment.listComments({
+      postId,
+      offset,
+    });
+    ctx.body = data;
+  } catch (e) {
+    ctx.throw(e);
+  }
+};

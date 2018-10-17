@@ -7,6 +7,7 @@ type Props = {
   open: boolean,
   children: Node,
   onClose(): void,
+  onSave(): Promise<*>,
 };
 
 class CategoryEditModal extends Component<Props> {
@@ -53,7 +54,7 @@ class CategoryEditModal extends Component<Props> {
           <div className="button cancel" onClick={onClose}>
             취소
           </div>
-          <div className="button save">
+          <div className="button save" onClick={onSave}>
             저장
           </div>
         </div>

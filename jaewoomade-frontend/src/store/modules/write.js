@@ -19,6 +19,11 @@ const CREATE_TEMP_CATEGORY = 'write/CREATE_TEMP_CATEGORY';
 const TOGGLE_EDIT_CATEGORY = 'write/TOGGLE_EDIT_CATEGORY';
 const CHANGE_CATEGORY_NAME = 'write/CHANGE_CATEGORY_NAME';
 const HIDE_CATEGORY = 'write/HIDE_CATEGORY';
+const CREATE_CATEGORY = 'write/CREATE_CATEGORY';
+const DELETE_CATEGORY = 'write/DELETE_CATEGORY';
+const UPDATE_CATEGORY = 'write/UPDATE_CATEGORY';
+const REORDER_CATEGORY = 'write/REORDER_CATEGORY';
+const REORDER_CATEGORIES = 'write/REORDER_CATEGORIES';
 
 let tempCategoryId = 0;
 
@@ -37,6 +42,11 @@ export type WriteActionCreators = {
   toggleEditCategory(id: string): any,
   changeCategoryName({ id:string, name: string }): any,
   hideCategory(id: string): any,
+  createCategory(name: string, id: string): any,
+  deleteCategory(id: string): any,
+  updateCategory({ id: string, name: string }): any,
+  reorderCategory({ from: number, to: number}): any,
+  reorderCategories(categoryOrders: MeAPI.ReorderCategoryPayload): any,
 }
 
 export const actionCreators = {
@@ -54,6 +64,11 @@ export const actionCreators = {
   toggleEditCategory: createAction(TOGGLE_EDIT_CATEGORY, id => id),
   changeCategoryName: createAction(CHANGE_CATEGORY_NAME, ({ id, name }) => ({ id, name })),
   hideCategory: createAction(HIDE_CATEGORY, id => id),
+  createCategory: createAction(CREATE_CATEGORY, MeAPI.createCategory, (name, id) => id),
+  deleteCategory: createAction(DELETE_CATEGORY, MeAPI.deleteCategory),
+  updateCategory: createAction(UPDATE_CATEGORY, MeAPI.updateCategory),
+  reorderCategory: createAction(REORDER_CATEGORY),
+  reorderCategories: createAction(REORDER_CATEGORIES, MeAPI.reorderCategories),
 };
 
 export type Category = {
@@ -67,6 +82,7 @@ export type Category = {
   temp?: boolean,
   edit?: boolean,
   hide?: boolean,
+  edited?: boolean,
 };
 
 export type Categories = List<Category>;
@@ -80,6 +96,7 @@ export type SubmitBox = {
 export type CategoryModal = {
   open: boolean,
   categories: ?Categories,
+  ordered: boolean,
 };
 
 export type PostData = {
@@ -113,6 +130,7 @@ const CategorySubrecord = Record({
   active: false,
   edit: false,
   temp: false,
+  edited: false,
   hide: false,
 });
 
@@ -125,6 +143,7 @@ const SubmitBoxSubrecord = Record({
 const CategoryModalSubrecord = Record({
   open: false,
   categories: null,
+  ordered: false,
 });
 
 const WriteRecord = Record({
@@ -172,7 +191,7 @@ export default handleActions({
       .setIn(
         ['categoryModal', 'categories'],
         state.getIn(['submitBox', 'categories']),
-      ),
+      ).setIn(['categoryModal', 'ordered'], false),
   ),
   [CLOSE_CATEGORY_MODAL]: state => state.setIn(['categoryModal', 'open'], false),
   [CREATE_TEMP_CATEGORY]: state => state.updateIn(
@@ -192,8 +211,11 @@ export default handleActions({
       c => c.id === id,
     );
     return state.updateIn(
-      ['categoryModal', 'categories', index, 'edit'],
-      edit => !edit,
+      ['categoryModal', 'categories', index],
+      category => category.withMutations(
+        c => c.update('edit', edit => !edit)
+          .set('edited', true),
+      ),
     );
   },
   [CHANGE_CATEGORY_NAME]: (state, { payload: { id, name } }) => {
@@ -213,5 +235,24 @@ export default handleActions({
       ['categoryModal', 'categories', index, 'hide'],
       true,
     );
+  },
+  ...pender({
+    type: CREATE_CATEGORY,
+    onSuccess: (state, action) => {
+      const index = state.categoryModal.categories.findIndex(
+        category => category.id === action.meta);
+      return state.setIn(['categoryModal', 'categories', index, 'id'], action.payload.data.id);
+    },
+  }),
+  [REORDER_CATEGORY]: (state, { payload: { from, to } }) => {
+    const fromItem = state.categoryModal.categories.get(from);
+    console.log(fromItem);
+    return state.withMutations((s) => {
+      s.removeIn(['categoryModal', 'categories', from])
+        .updateIn(['categoryModal', 'categories'], (categories) => {
+          return categories.insert(to, fromItem);
+        })
+        .setIn(['categoryModal', 'ordered'], true);
+    });
   },
 }, initialState);

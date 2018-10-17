@@ -89,4 +89,5 @@ PostsCategories.findCategoriesByPostId = function (postId: string): Promise<*> {
     raw: true,
   });
 };
+
 export default PostsCategories;

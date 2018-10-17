@@ -218,6 +218,12 @@ export const likePost = async (ctx: Context): Promise<*> => {
   }
 };
 
+export const getLike = async (ctx: Context): Promise<*> => {
+  ctx.body = {
+    likes: ctx.post.likes,
+  }
+};
+
 export const unlikePost = async (ctx: Context): Promise<*> => {
   const { id } = ctx.params;
   const { id: userId } = ctx.user;

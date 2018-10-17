@@ -13,6 +13,7 @@ type Props = {
   onToggleEditCategory(id: string): void,
   onChange({ id: string, name: string }): void,
   onHideCategory(id: string): void,
+  innerRef(ref: any): void;
 }
 
 const CategoryEditItemList = ({
@@ -21,6 +22,7 @@ const CategoryEditItemList = ({
   onToggleEditCategory,
   onChange,
   onHideCategory,
+  innerRef,
 }: Props) => {
   if (!categories) return null;
   const categoryList = categories.filter(c => !c.hide).map(
@@ -41,7 +43,9 @@ const CategoryEditItemList = ({
   );
   return (
     <div className="CategoryEditItemList">
-      {categoryList}
+      <div ref={innerRef}>
+        {categoryList}
+      </div>
       <div className="create-category util flex-center" onClick={onCreate}>
         <CreateIcon />
         <div>새 카테고리 만들기</div>
