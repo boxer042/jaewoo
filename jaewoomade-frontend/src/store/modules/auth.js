@@ -19,7 +19,7 @@ const AUTOCOMPLETE_REGISTER_FORM = 'auth/AUTOCOMPLETE_REGISTER_FORM';
 
 type AutocompleteFormPayload = {
   email: ?string,
-  displayName: string,
+  name: string,
 }
 
 export type AuthActionCreators = {
@@ -68,7 +68,7 @@ export type AuthResult = ?{
     id: string,
     username: string,
     displayName: string,
-    thumbnail: ?string,
+    thumbnail?: ?string,
   },
   token: string
 };

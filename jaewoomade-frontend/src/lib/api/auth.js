@@ -4,6 +4,11 @@ import axios from 'axios';
 export const sendAuthEmail = (email: string): Promise<*> => axios.post('/auth/send-auth-email', { email });
 export const getCode = (code: string): Promise<*> => axios.get(`/auth/code/${code}`);
 
+type RegisterForm = {
+  username: string,
+  shortBio: string,
+  displayName: string,
+}
 export type LocalRegisterPayload = {
   registerToken: string,
   form: {
@@ -32,7 +37,7 @@ export const verifySocial = ({ provider, accessToken }: VerifySocialPayload) => 
 export type SocialRegisterPayload = {
   provider: string,
   accessToken: string,
-  form: RegisterForm
+  form: RegisterForm,
 }
 export const socialRegister = ({ provider, accessToken, form }: SocialRegisterPayload) => axios.post(`/auth/register/${provider}`, {
   accessToken, form });

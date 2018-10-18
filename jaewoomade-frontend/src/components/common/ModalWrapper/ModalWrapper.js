@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, type Node } from 'react';
 import cx from 'classnames';
 
 import './ModalWrapper.scss';
@@ -60,7 +60,7 @@ class ModalWrapper extends Component<Props, State> {
                   disappear: animate && !open,
                 })}
             >
-                { children }
+                {children}
             </div>
           </div>
         </div>

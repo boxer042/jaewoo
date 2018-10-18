@@ -14,7 +14,7 @@ export const writeComment: Middleware = async (ctx: Context) => {
   const schema = Joi.object().keys({
     text: Joi.string().min(1).max(1000).required(),
     reply_to: Joi.string().uuid(),
-  })
+  });
 
   if (!validateSchema(ctx, schema)) {
     return;

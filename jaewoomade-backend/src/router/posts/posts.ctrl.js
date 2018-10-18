@@ -3,7 +3,7 @@
 import type { Context } from 'koa';
 import Joi from 'joi';
 import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
-import { Category, Post, PostsCategories, PostsTags, Tag, User, UserProfile } from 'database/models';
+import { Category, Post, PostsCategories, PostsTags, Tag, User, UserProfile, Comment } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
 import Sequelize from 'sequelize';
@@ -102,7 +102,8 @@ export const readPost = async (ctx: Context): Promise<*> => {
       ctx.status = 404;
       return;
     }
-    ctx.body = serializePost(post);
+    const commentsCount = await Comment.getCommentsCount(post.id);
+    ctx.body = serializePost({ ...post.toJSON(), comments_count: commentsCount });
   } catch (e) {
     ctx.throw(500, e);
   }

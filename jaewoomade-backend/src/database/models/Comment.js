@@ -44,6 +44,18 @@ export type WriteParams = {
   level: number
 };
 
+Comment.getCommentsCount = async function (postId: string) {
+  return Comment.count({
+    where: {
+      fk_post_id: postId,
+    },
+  });
+};
+
+Comment.getCommentsCountList = function (postIds: string[]) {
+  return postIds.map(this.getCommentsCount);
+};
+
 Comment.readComment = async function (commentId: string) {
   try {
     const data = await Comment.findOne({
@@ -57,7 +69,7 @@ Comment.readComment = async function (commentId: string) {
     });
     if (!data) return null;
     return this.serialize(data);
-  } catch(e) {
+  } catch (e) {
     throw e;
   }
 };
@@ -114,7 +126,7 @@ Comment.listComments = async function ({
   } catch (e) {
     throw e;
   }
-}
+};
 
 Comment.write = function ({
   postId,
@@ -122,7 +134,7 @@ Comment.write = function ({
   text,
   replyTo,
   level,
-}: WriteParams){
+}: WriteParams) {
   return Comment.build({
     fk_user_id: userId,
     fk_post_id: postId,

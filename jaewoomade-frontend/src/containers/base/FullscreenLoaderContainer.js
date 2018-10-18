@@ -17,7 +17,7 @@ class FullscreenLoaderContainer extends Component<Props> {
 }
 
 export default connect(
-  ({ base }: state) => ({
+  ({ base }: State) => ({
     visible: base.fullscreenLoader,
   }),
   () => ({}),
