@@ -80,8 +80,28 @@ export const getCommentList: Middleware = async (ctx: Context) => {
       postId,
       offset,
     });
+    const link = `<${ctx.path}?offset=${parseInt(offset, 10) + 20}>; rel="next";`;
+    if (count >= offset + 20) {
+      ctx.set('Link', link);
+    }
     ctx.body = data;
   } catch (e) {
     ctx.throw(e);
+  }
+};
+
+export const getReplies: Middleware = async (ctx: Context) => {
+  const postId = ctx.post.id;
+  const { commentId } = ctx.params;
+  try {
+    const comments = await Comment.listComments({
+      postId,
+      replyTo: commentId,
+    });
+    const link = `<${ctx.path}>; rel="next";`;
+    console.log(link);
+    ctx.body = comments.data;
+  } catch (e) {
+    ctx.throw(500, e);
   }
 };

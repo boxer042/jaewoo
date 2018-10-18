@@ -45,7 +45,7 @@ class SubmitBox extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.this.animateTimeout);
+    clearTimeout(this.animateTimeout);
   }
 
   animate = () => {
