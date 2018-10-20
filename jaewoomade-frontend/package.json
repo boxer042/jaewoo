@@ -43,7 +43,7 @@
     "prism-themes": "^1.0.1",
     "prismjs": "^1.15.0",
     "promise": "8.0.1",
-    "query-string": "^6.0.0",
+    "query-string": "^5.0.1",
     "raf": "3.4.0",
     "react": "^16.3.2",
     "react-dev-utils": "^5.0.1",
@@ -70,7 +70,9 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "deploy": "aws s3 sync ./build s3://cdn.jaewoomade.com/",
+    "invalidate": "aws cloudfront create-invalidation --distribution-id E4SX87S87PXR8 --paths / /index.html /error.html /service-worker.js /manifest.json /favicon.ico"
   },
   "jest": {
     "collectCoverageFrom": [

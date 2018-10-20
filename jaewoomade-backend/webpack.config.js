@@ -25,9 +25,9 @@ module.exports = {
         exclude: /node_modules\/(?!(koa-bodyparser)\/).*/,
         loader: 'babel-loader',
         options: {
-          plugins: ['transform-object-rest-spread', 'transform-async-to-generator'],
+          plugins: ['transform-object-rest-spread', 'transform-async-to-generator', 'transform-decorators-legacy'],
           presets: [
-            'flow',
+            'flow','stage-0',
           ],
         },
       },
