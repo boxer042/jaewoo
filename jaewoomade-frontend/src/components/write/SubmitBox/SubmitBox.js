@@ -11,6 +11,7 @@ type Props = {
   selectCategory: any,
   inputTags: any,
   visible: boolean,
+  isEdit: boolean,
   onClose(): void,
   categories: ?Categories,
   onSubmit(): void,
@@ -62,8 +63,8 @@ class SubmitBox extends Component<Props, State> {
 
   render() {
     const {
-      isEditing, selectCategory, inputTags, visible,
-      onSubmit, onEditCategoryClick,
+      isEdit, selectCategory, inputTags, visible,
+      onSubmit, onEditCategoryClick, onClose,
     } = this.props;
     const { animating } = this.state;
     if (!visible && !animating) return null;
@@ -71,7 +72,8 @@ class SubmitBox extends Component<Props, State> {
     return (
       <div className={cx('SubmitBox', visible ? 'appear' : 'disappear')}>
         <div className="title">
-          {isEditing ? '수정하기' : '새 글 작성하기'}
+          <div className="text">{isEdit ? '수정하기' : '새 글 작성하기'}</div>
+          {isEdit && <div className="view">글 보기</div>}
         </div>
         <div className="sections">
           <section>
@@ -95,8 +97,8 @@ class SubmitBox extends Component<Props, State> {
           <div className="open-options">
             <span>추가설정</span>
           </div>
-          <div className="submit-button util flex-center" onClick={onSubmit}>
-            작성하기
+          <div className={cx('submit-button', 'util', 'flex-center', { edit: isEdit })} onClick={onSubmit}>
+            { isEdit ? '업데이트' : '작성하기' }
           </div>
         </div>
       </div>

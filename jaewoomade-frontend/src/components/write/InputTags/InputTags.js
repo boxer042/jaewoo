@@ -8,7 +8,7 @@ import './InputTags.scss';
 
 
 type Props = {
-  tags: List<string>,
+  tags: string[],
   onInsert(string): void,
   onRemove(string): void,
 };

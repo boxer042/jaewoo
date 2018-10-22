@@ -6,7 +6,7 @@ const { SECRET_KEY: secret } = process.env;
 export const generate = (payload: any, options: any): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, secret, {
-      issuer: 'jaewoomade.io',
+      issuer: 'jaewoomade.com',
       expiresIn: '7d',
       ...options,
     }, (err, token) => {

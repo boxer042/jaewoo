@@ -6,15 +6,16 @@ import InputTags from 'components/write/InputTags';
 import { connect } from 'react-redux';
 import type { State } from 'store';
 import { WriteActions, UserActions } from 'store/actionCreators';
-import type { Categories } from 'store/modules/write';
+import type { Categories, PostData } from 'store/modules/write';
 import type { List } from 'immutable';
 
 type Props = {
   open: boolean,
   categories: ?Categories,
-  tags: List<string>,
+  tags: string[],
   title: string,
   body: string,
+  postData: ?PostData,
 }
 
 class SubmitBoxContainer extends Component<Props> {
@@ -54,22 +55,16 @@ class SubmitBoxContainer extends Component<Props> {
     WriteActions.closeSubmitBox();
   }
   onSubmit = async () => {
-    const { categories, tags, title, body } = this.props;
+    const { categories, tags, title, body, postData } = this.props;
 
-    // console.log({
-    //   title,
-    //   body,
-    //   categories: categories ? categories.filter(c => c.active).map(c => c.id).toJS() : [],
-    //   tags: tags.toJS(),
-    // });
     try {
       await WriteActions.writePost({
         title,
         body,
+        tags,
         isMarkdown: true,
         isTemp: false,
-        tags: tags.toJS(),
-        categories: categories ? categories.filter(c => c.active).map(c => c.id).toJS() : [],
+        categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
       });
     } catch (e) {
       console.log(e);
@@ -81,7 +76,7 @@ class SubmitBoxContainer extends Component<Props> {
       onClose, onToggleCategory, onInsertTag, onRemoveTag,
       onSubmit, onEditCategoryClick,
     } = this;
-    const { open, categories, tags } = this.props;
+    const { open, categories, tags, postData } = this.props;
     return (
       <SubmitBox
         onEditCategoryClick={onEditCategoryClick}
@@ -90,6 +85,7 @@ class SubmitBoxContainer extends Component<Props> {
         visible={open}
         onClose={onClose}
         onSubmit={onSubmit}
+        isEdit={!!postData}
       />
     );
   }
@@ -102,6 +98,7 @@ export default connect(
     tags: write.submitBox.tags,
     body: write.body,
     title: write.title,
+    postData: write.postData,
   }),
   () => ({}),
 )(SubmitBoxContainer);
