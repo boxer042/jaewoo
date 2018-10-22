@@ -22,4 +22,22 @@ FollowUser.associate = function associate() {
   FollowUser.belongsTo(User, { foreignKey: 'fk_follow_user_id', onDelete: 'restrict', onUpdate: 'restrict' });
 };
 
+FollowUser.getListOfUser = function getListOfUser(userId) {
+  return FollowUser.findAll({
+    where: {
+      fk_user_id: userId,
+    },
+    include: [User],
+  });
+};
+
+FollowUser.serialize = function serialize(data) {
+  return {
+    id: data.id,
+    fk_follow_user_id: data.fk_follow_user_id,
+    username: data.user.username,
+    created_at: data.created_at,
+  };
+};
+
 export default FollowUser;
