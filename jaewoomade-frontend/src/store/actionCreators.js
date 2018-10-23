@@ -6,6 +6,7 @@ import { actionCreators as authActions, type AuthActionCreators } from './module
 import { actionCreators as userActions, type UserActionCreators } from './modules/user';
 import { actionCreators as baseActions, type BaseActionCreators } from './modules/base';
 import { actionCreators as writeActions, type WriteActionCreators } from './modules/write';
+import { actionCreators as postsActions, type PostsActionCreators } from './modules/posts';
 
 const { dispatch } = store;
 
@@ -13,3 +14,4 @@ export const AuthActions: AuthActionCreators = bindActionCreators(authActions, d
 export const UserActions: UserActionCreators = bindActionCreators(userActions, dispatch);
 export const BaseActions: BaseActionCreators = bindActionCreators(baseActions, dispatch);
 export const WriteActions: WriteActionCreators = bindActionCreators(writeActions, dispatch);
+export const PostsActions: PostsActionCreators = bindActionCreators(postsActions, dispatch);

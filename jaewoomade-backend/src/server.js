@@ -1,12 +1,11 @@
 // @flow
 import Koa from 'koa';
-import bodyParser from 'koa-bodyparser';
 import serverless from 'serverless-http';
 import cors from 'lib/middlewares/cors';
 import authToken from 'lib/middlewares/authToken';
 import db from 'database/db';
 import { associate } from 'database/sync';
-
+import koaBody from 'koa-body';
 import router from './router';
 
 
@@ -35,7 +34,9 @@ export default class Server {
     const { app } = this;
     app.use(cors);
     app.use(authToken);
-    app.use(bodyParser());
+    app.use(koaBody({
+      multipart: true,
+    }));
     app.use(router.routes())
       .use(router.allowedMethods());
     app.use((ctx) => {

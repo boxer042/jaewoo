@@ -4,84 +4,73 @@
  * @author Lea Verou
  */
 
- code[class*="language-"],
- pre[class*="language-"] {
-   font-size: 1em;
-   color: #ABB2BF;
-   background: none;
-   font-family: 'D2 Coding', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-   text-align: left;
-   white-space: pre;
-   word-spacing: normal;
-   word-break: normal;
-   word-wrap: normal;
-   line-height: 1.5;
-   -moz-tab-size: 4;
-   -o-tab-size: 4;
-   tab-size: 4;
-   -webkit-hyphens: none;
-   -moz-hyphens: none;
-   -ms-hyphens: none;
-   hyphens: none;
+ code[class*="lang-"],
+ pre[class*="lang-"] {
+   color: #abb2bf;
+   background: none; // text-align: left;
+   // white-space: pre;
+   // word-spacing: normal;
+   // word-break: normal;
+   // word-wrap: normal;
+   // -moz-tab-size: 4;
+   // -o-tab-size: 4;
+   // tab-size: 4;
+   // -webkit-hyphens: none;
+   // -moz-hyphens: none;
+   // -ms-hyphens: none;
+   // hyphens: none;
  }
  
- 
- pre[class*="language-"]::-moz-selection,
- pre[class*="language-"] ::-moz-selection,
- code[class*="language-"]::-moz-selection,
- code[class*="language-"] ::-moz-selection {
+ pre[class*="lang-"]::-moz-selection,
+ pre[class*="lang-"] ::-moz-selection,
+ code[class*="lang-"]::-moz-selection,
+ code[class*="lang-"] ::-moz-selection {
    text-shadow: none;
    background: #383e49;
  }
  
- pre[class*="language-"]::selection,
- pre[class*="language-"] ::selection,
- code[class*="language-"]::selection,
- code[class*="language-"] ::selection {
+ pre[class*="lang-"]::selection,
+ pre[class*="lang-"] ::selection,
+ code[class*="lang-"]::selection,
+ code[class*="lang-"] ::selection {
    text-shadow: none;
    background: #9aa2b1;
  }
  
- @media print {
-   code[class*="language-"],
-   pre[class*="language-"] {
-     text-shadow: none;
-   }
- }
- 
- /* Code blocks */
- 
- pre[class*="language-"] {
-   padding: 1em;
-   margin: .5em 0;
-   overflow: auto;
- }
- 
- pre[class*="language-"] {
-   padding: 1em;
-   padding-top: 2em;
-   padding-bottom: 2em;
-   overflow: auto;
- }
- 
- :not(pre)>code[class*="language-"],
- pre[class*="language-"] {
+ // @media print {
+ //   code[class*="lang-"],
+ //   pre[class*="lang-"] {
+ //     text-shadow: none;
+ //   }
+ // }
+ // /* Code blocks */
+ // pre[class*="lang-"] {
+ //   overflow: auto;
+ // }
+ // pre[class*="lang-"] {
+ //   overflow: auto;
+ // }
+ :not(pre)>code[class*="lang-"],
+ pre[class*="lang-"] {
    background: #282c34;
  }
  
- /* Inline code */
- 
- :not(pre)>code[class*="language-"] {
-   padding: .1em;
-   border-radius: .3em;
-   white-space: normal;
+ pre {
+   color: #abb2bf;
+   background: #282c34;
  }
  
+ // /* Inline code */
+ // :not(pre)>code[class*="lang-"] {
+ //   padding: 0.1em;
+ //   border-radius: 0.3em;
+ //   white-space: normal;
+ // }
  .token.comment,
  .token.prolog,
  .token.doctype,
  .token.cdata {
-   color: #5C6370;
+   color: #5c6370;
  }
  
  .token.punctuation {
@@ -114,7 +103,7 @@
  .token.operator,
  .token.entity,
  .token.url,
- .language-css .token.string,
+ .lang-css .token.string,
  .style .token.string {
    color: #56b6c2;
  }
@@ -180,7 +169,7 @@
  
  .line-numbers-rows>span:before {
    content: counter(linenumber);
-   color: #5C6370;
+   color: #5c6370;
    display: block;
    padding-right: 0.8em;
    text-align: right;

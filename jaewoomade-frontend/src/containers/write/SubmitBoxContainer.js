@@ -58,14 +58,25 @@ class SubmitBoxContainer extends Component<Props> {
     const { categories, tags, title, body, postData } = this.props;
 
     try {
-      await WriteActions.writePost({
-        title,
-        body,
-        tags,
-        isMarkdown: true,
-        isTemp: false,
-        categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
-      });
+      if (postData) { // update if the post already exists
+        await WriteActions.updatePost({
+          id: postData.id,
+          title,
+          body,
+          tags,
+          is_temp: false,
+          categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
+        });
+      } else {
+        await WriteActions.writePost({
+          title,
+          body,
+          tags,
+          isMarkdown: true,
+          isTemp: false,
+          categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
+        });
+      }
     } catch (e) {
       console.log(e);
     }

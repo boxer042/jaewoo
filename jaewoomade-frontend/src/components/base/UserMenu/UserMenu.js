@@ -30,7 +30,9 @@ const UserMenu = ({ onClick, onLogout, username }: Props) => {
               임시 글
             </UserMenuItem>
             <div className="separator" />
-            <UserMenuItem>
+            <UserMenuItem
+              to="/posts/@boxer042/One-mornig-when-Gregor-hrjnldg5xe"
+            >
               설정
             </UserMenuItem>
             <UserMenuItem onClick={onLogout}>

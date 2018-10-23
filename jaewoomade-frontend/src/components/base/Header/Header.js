@@ -14,11 +14,6 @@ const Header = ({ right, userMenu }: Props) => (
       <div className="brand">
         JAEWOOMADE
       </div>
-      <nav>
-        <a className="active" href="/">트렌딩</a>
-        <a href="/">최신 글</a>
-        <a href="/">태그</a>
-      </nav>
       <div className="right">
         {right}
         {userMenu}
