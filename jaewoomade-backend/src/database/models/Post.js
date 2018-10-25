@@ -64,7 +64,7 @@ Post.readPost = function (username: string, urlSlug: string) {
 
 Post.readPostById = function (id) {
   return Post.findOne({
-    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes'],
+    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes', 'is_temp'],
     include: [{
       model: User,
       attributes: ['username'],
@@ -191,13 +191,13 @@ Post.prototype.getCategoryIds = async function (): Promise<*> {
 export const serializePost = (data: any) => {
   const {
     id, title, body, thumbnail, is_markdown, created_at,
-    updated_at, url_slug, likes, comments_count,
+    updated_at, url_slug, likes, comments_count, is_temp,
   } = data;
   const tags = data.tags.map(tag => tag.name);
   const categories = data.categories.map(category => ({ id: category.id, name: category.name }));
   return {
     id, title, body, thumbnail, is_markdown,
-    created_at, updated_at, tags, categories, url_slug, likes, comments_count,
+    created_at, updated_at, tags, categories, url_slug, likes, comments_count, is_temp,
   };
 };
 

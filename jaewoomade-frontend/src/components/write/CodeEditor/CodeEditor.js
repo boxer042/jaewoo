@@ -1,6 +1,5 @@
 // @flow
-
-import React, { Component } from 'react';
+import React, { Component, type Node } from 'react';
 import marked from 'marked';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -26,7 +25,8 @@ if (process.env.APP_ENV !== 'server') {
 
 type Props = {
   body: string,
-  onEditBody(value: string): any
+  onEditBody(value: string): any,
+  imageButton: Node,
 }
 
 type State = {
@@ -171,9 +171,11 @@ class CodeEditor extends Component<Props, State> {
   }
 
   render() {
+    const { imageButton } = this.props;
     return (
       <div className="CodeEditor material">
         <div className="editor" ref={(ref) => { this.editor = ref; }} />
+        { imageButton }
         {/* <textarea ref={(ref) => { this.textarea = ref; }} /> */ }
       </div>
     );

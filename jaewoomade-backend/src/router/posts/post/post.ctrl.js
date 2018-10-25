@@ -145,7 +145,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
           fk_user_id: ctx.user.id,
         },
       });
-      if (count !== categories.length) {
+      if (count !== categories.length && categories.length !== 0) {
         ctx.status = 409;
         ctx.body = {
           name: 'NOT_OWN_CATEGORY',

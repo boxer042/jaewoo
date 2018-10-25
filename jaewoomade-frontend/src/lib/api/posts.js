@@ -33,3 +33,28 @@ export type ReadPostPayload = {
 };
 
 export const readPost = ({ username, urlSlug }: ReadPostPayload) => axios.get(`/posts/@${username}/${urlSlug}`);
+
+export type UploadImagePayload = {
+  file: any,
+  post_id: string,
+  onUploadProgress(): void,
+};
+
+export const uploadImage = ({ file, postId, onUploadProgress }: UploadImagePayload) => {
+  const data = new FormData();
+  data.append('post_id', postId);
+  data.append('image', file);
+  return axios.post('/files/upload', data, {
+    onUploadProgress,
+  });
+};
+
+export type TempSavePayload = {
+  title: string,
+  body: string,
+  postId: string,
+};
+
+export const tempSave = ({ postId, title, body }: TempSavePayload) => {
+  axios.post(`/posts/${postId}/saves`, { title, body });
+};

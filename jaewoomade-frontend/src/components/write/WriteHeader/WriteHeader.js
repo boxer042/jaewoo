@@ -10,12 +10,15 @@ type Props = {
   onOpenSubmitBox(): void,
   title: string,
   isEdit: boolean,
+  isTemp: boolean,
+  onTempSave(): void,
 }
 const WriteHeader = ({
   onChangeTitle,
   onOpenSubmitBox,
   title,
   isEdit,
+  onTempSave,
 }: Props) => {
   return (
     <div className="WriteHeader">
@@ -29,7 +32,7 @@ const WriteHeader = ({
         />
       </div>
       <div className="actions">
-        <div className="button temp-save">
+        <div className="button temp-save" onClick={onTempSave} >
           임시저장
         </div>
         <div className={cx('button', isEdit ? 'edit' : 'submit')} onClick={onOpenSubmitBox}>

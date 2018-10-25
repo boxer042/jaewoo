@@ -27,6 +27,7 @@ const REORDER_CATEGORY = 'write/REORDER_CATEGORY';
 const REORDER_CATEGORIES = 'write/REORDER_CATEGORIES';
 const UPDATE_POST = 'write/UPDATE_POST';
 const RESET = 'wirte/RESET';
+const TEMP_SAVE = 'write/TEMP_SAVE';
 
 let tempCategoryId = 0;
 /* ACTION CREATOR */
@@ -57,6 +58,7 @@ export interface CounterActionCreators {
   reorderCategories(categoryOrders: MeAPI.ReorderCategoryPayload): any,
   updatePost(payload: PostsAPI.UpdateCategoryPayload): any,
   reset(): any,
+  tempSave(payload: PostsAPI.TempSavePayload): any,
 }
 
 /* EXPORT ACTION CREATORS */
@@ -83,6 +85,7 @@ export const actionCreators = {
   reorderCategories: createAction(REORDER_CATEGORIES, MeAPI.reorderCategories),
   updatePost: createAction(UPDATE_POST, PostsAPI.updatePost),
   reset: createAction(RESET),
+  tempSave: createAction(TEMP_SAVE, PostsAPI.tempSave),
 };
 
 /* ACTION FLOW TYPE */
@@ -127,6 +130,7 @@ export type PostData = {
   body: string,
   thumbnail: string,
   is_markdown: boolean,
+  is_temp: boolean,
   created_at: string,
   updated_at: string,
   tags: string[],
@@ -298,6 +302,14 @@ export default applyPenders(reducer, [
             ...c,
             active: categoryIds.indexOf(c.id) !== -1,
           }));
+        }
+        // existing active categories
+        if (state.submitBox.categories && state.submitBox.categories.length > 0) {
+          const categoryIds = state.submitBox.categories.filter(c => c.active).map(c => c.id);
+          if (!draft.submitBox.categories) return;
+          draft.submitBox.categories = draft.submitBox.categories.map(
+            c => (categoryIds.indexOf(c.id) !== -1 ? { ...c, active: true } : c),
+          );
         }
       });
     },
