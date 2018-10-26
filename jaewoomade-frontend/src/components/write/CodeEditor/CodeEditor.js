@@ -27,6 +27,10 @@ type Props = {
   body: string,
   onEditBody(value: string): any,
   imageButton: Node,
+  onDragEnter(e: any): void,
+  onDragLeave(e: any): void,
+  onClearInsertText(): void,
+  inserText: ?string,
 }
 
 type State = {
@@ -43,6 +47,27 @@ class CodeEditor extends Component<Props, State> {
   state = {
     cursor: null,
   }
+
+  insertText = () => {
+    const { insertText, onClearInsertText } = this.props;
+    const editor = this.codeMirror;
+    const selection = editor.getSelection();
+
+    if (selection.length > 0) {
+      editor.replaceSelection(insertText);
+    } else {
+      const doc = editor.getDoc();
+      const cursor = doc.getCursor();
+
+      const pos = {
+        line: cursor.line,
+        ch: cursor.ch,
+      };
+
+      doc.replaceRange(insertText, pos);
+    }
+    onClearInsertText();
+  };
 
   onScroll = (e: any) => {
     // retrieve current scroll info and line number
@@ -103,10 +128,11 @@ class CodeEditor extends Component<Props, State> {
       top: previewScrollTop,
     });
     // console.log(elements[index - 1]);
-  }
+  };
 
   initialize = () => {
     if (!CodeMirror) return;
+    const { onDragEnter, onDragLeave } = this.props;
     this.codeMirror = CodeMirror(this.editor, {
       mode: 'markdown',
       theme: 'material',
@@ -115,10 +141,13 @@ class CodeEditor extends Component<Props, State> {
       scrollbarStyle: 'overlay',
       placeholder: '작성해주세요.',
     });
+    window.codeMirror = this.codeMirror; // for debugging use
     this.codeMirror.on('change', this.onChange);
     this.codeMirror.on('scroll', this.onScroll);
+    this.codeMirror.on('dragenter', (event, e) => onDragEnter(e));
+    this.codeMirror.on('dragleave', (event, e) => onDragLeave(e));
     // TODO: load data (for updating)
-  }
+  };
 
   onChange = (doc: any) => {
     const cursor = doc.getCursor();
@@ -144,30 +173,23 @@ class CodeEditor extends Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    // const { codeMirror } = this;
-    // const { cursor } = this.state;
-    // const { body } = this.props;
+    const { codeMirror } = this;
+    const { cursor } = this.state;
+    const { body } = this.props;
 
-    // if (!codeMirror) return;
-
-    // // diff cursor
-    // if (prevState.cursor !== cursor) {
-    //   codeMirror.setCursor(cursor);
-    //   return;
-    // }
-    // if (prevProps.body !== body) {
-    //   const scrollInfo = codeMirror.getScrollInfo();
-    //   codeMirror.setValue(body);
-    //   if (!cursor) return;
-    //   codeMirror.setCursor(cursor);
-    //   codeMirror.scrollTo(scrollInfo.left, scrollInfo.top);
-    //   // if editing the last line
-    //   const { line } = cursor;
-    //   const last = codeMirror.lastLine();
-    //   if (line === last) {
-    //     codeMirror.scrollTo(0, codeMirror.cursorCoords().top);
-    //   }
-    // }
+    if (!codeMirror) return;
+    // diff cursor
+    if (prevState.cursor !== cursor) {
+      codeMirror.setCursor(cursor);
+    }
+    if (prevProps.body !== body && body !== this.codeMirror.getValue()) {
+      codeMirror.setValue(body);
+      if (!cursor) return;
+      codeMirror.setCursor(cursor);
+    }
+    if (!prevProps.insertText && this.props.insertText) {
+      this.insertText();
+    }
   }
 
   render() {

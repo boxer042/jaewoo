@@ -1,12 +1,42 @@
 // @flow
-
 import type { Context } from 'koa';
 import Joi from 'joi';
 import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
-import { Category, Post, PostsCategories, PostsTags, Tag, User, UserProfile, Comment } from 'database/models';
+import { 
+  Category,
+  Post,
+  PostsCategories,
+  PostsTags,
+  Tag,
+  User,
+  UserProfile,
+  Comment,
+  FollowUser,
+  FollowTag,
+} from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
 import Sequelize from 'sequelize';
+
+async function createFeeds(postId: string, userId: string, tagIds: string[]): Promise<*> {
+  // TODO:
+  // 1. USER FOLLOW
+  try {
+    const followers = await FollowUser.findAll({
+      attributes: ['fk_user_id'],
+      where: { fk_follow_user_id: userId },
+      raw: true,
+    });
+    console.log(users);
+  } catch (e) {
+    console.log(e);
+  }
+
+  // 2. TAG FOLLOW (FOR EACH)
+  // 3. REMOVE DUPLICATE
+  // 4. CREATE FEEDS
+  // 5. REALTIME.. AWS IOT (Minutely Short Polling)
+}
 
 export const writePost = async (ctx: Context): Promise<*> => {
   type BodySchema = {
@@ -89,6 +119,10 @@ export const writePost = async (ctx: Context): Promise<*> => {
     const serialized = serializePost(postData);
 
     ctx.body = serialized;
+
+    if (!isTemp) {
+      createFeeds(postId, ctx.user.id, tagIds);
+    }
   } catch (e) {
     ctx.throw(500, e);
   }

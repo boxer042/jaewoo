@@ -3,6 +3,7 @@ import { createAction, handleActions, type ActionType } from 'redux-actions';
 import produce from 'immer';
 import * as MeAPI from 'lib/api/me';
 import * as PostsAPI from 'lib/api/posts';
+import format from 'date-fns/format';
 import { applyPenders } from 'lib/common';
 
 /* ACTION TYPE */
@@ -28,15 +29,19 @@ const REORDER_CATEGORIES = 'write/REORDER_CATEGORIES';
 const UPDATE_POST = 'write/UPDATE_POST';
 const RESET = 'wirte/RESET';
 const TEMP_SAVE = 'write/TEMP_SAVE';
+const SET_UPLOAD_MASK = 'write/SET_UPLOAD_MASK';
+const SET_TEMP_DATA = 'write/SET_TEMP_DATA';
+const SET_INSERT_TEXT = 'write/SET_INSERT_TEXT';
 
 let tempCategoryId = 0;
+
 /* ACTION CREATOR */
 type EditFieldPayload = { field: string, value: string };
 type ChangeCategoryNamePayload = { id: string, name: string };
 type ReroderCategoryPayload = { from: number, to: number };
 
 /* ACTION CREATORS INTERFACE */
-export interface CounterActionCreators {
+export interface WriteActionCreators {
   editField(payload: EditFieldPayload): any,
   openSubmitBox(): any,
   closeSubmitBox(): any,
@@ -59,6 +64,9 @@ export interface CounterActionCreators {
   updatePost(payload: PostsAPI.UpdateCategoryPayload): any,
   reset(): any,
   tempSave(payload: PostsAPI.TempSavePayload): any,
+  setUploadMask(visible: boolean): any;
+  setTempData(): any;
+  setInsertText(text: ?string): any;
 }
 
 /* EXPORT ACTION CREATORS */
@@ -86,19 +94,26 @@ export const actionCreators = {
   updatePost: createAction(UPDATE_POST, PostsAPI.updatePost),
   reset: createAction(RESET),
   tempSave: createAction(TEMP_SAVE, PostsAPI.tempSave),
+  setUploadMask: createAction(SET_UPLOAD_MASK, (visible: boolean) => visible),
+  setTempData: createAction(SET_TEMP_DATA, () => {
+    const now = format(new Date(), 'YYYY-MM-DD HH:MM');
+    const tempText = `${now} 작성됨`;
+    return tempText;
+  }),
+  setInsertText: createAction(SET_INSERT_TEXT, (text: ?string) => text),
 };
 
-/* ACTION FLOW TYPE */
-type EditFieldAction = ActionType<typeof actionCreators.editField>;
-type ToggleCategoryAction = ActionType<typeof actionCreators.toggleCategory>;
-type InsertTagAction = ActionType<typeof actionCreators.insertTag>;
-type RemovetagAction = ActionType<typeof actionCreators.removeTag>;
-type ToggleEditCategoryAction = ActionType<typeof actionCreators.toggleEditCategory>;
-type ChangeCategoryNameAction = ActionType<typeof actionCreators.changeCategoryName>;
-type HideCategoryAction = ActionType<typeof actionCreators.hideCategory>;
-type ReorderCategoryAction = ActionType<typeof actionCreators.reorderCategory>;
-
 /* STATE TYPES */
+export type BriefTempSaveInfo = {
+  id: string,
+  created_at: string,
+  title: string,
+};
+
+export type TempSaveData = BriefTempSaveInfo & {
+  body: string,
+};
+
 export type Category = {
   id: string,
   order: number,
@@ -137,13 +152,36 @@ export type PostData = {
   categories: { id: string, name: string }[],
   url_slug: string
 };
+export type Upload = {
+  mask: boolean,
+  uploading: boolean,
+  progress: number,
+  uploadUrl: ?string,
+  id: ?string,
+  imagePath: ?string,
+};
 export type Write = {
   body: string,
   title: string,
   submitBox: SumbitBox,
   postData: ?PostData,
   categoryModal: CategoryModal,
+  upload: Upload,
+  insertText: ?string,
+  tempSaves: ?(BriefTempSaveInfo[]),
 };
+
+/* ACTION FLOW TYPE */
+type EditFieldAction = ActionType<typeof actionCreators.editField>;
+type ToggleCategoryAction = ActionType<typeof actionCreators.toggleCategory>;
+type InsertTagAction = ActionType<typeof actionCreators.insertTag>;
+type RemovetagAction = ActionType<typeof actionCreators.removeTag>;
+type ToggleEditCategoryAction = ActionType<typeof actionCreators.toggleEditCategory>;
+type ChangeCategoryNameAction = ActionType<typeof actionCreators.changeCategoryName>;
+type HideCategoryAction = ActionType<typeof actionCreators.hideCategory>;
+type ReorderCategoryAction = ActionType<typeof actionCreators.reorderCategory>;
+type SetUploadMaskAction = ActionType<typeof actionCreators.setUploadMask>;
+type SetTempDataAction = ActionType<typeof actionCreators.setTempData>;
 
 /* INITIAL STATE */
 const initialState: Write = {
@@ -160,6 +198,16 @@ const initialState: Write = {
     categories: null,
     ordered: false,
   },
+  upload: {
+    mask: false,
+    uploading: false,
+    progress: 0,
+    uploadUrl: null,
+    imagePath: null,
+    id: null,
+  },
+  insertText: null,
+  tempSaves: null,
 };
 
 /* REDUCER */
@@ -274,9 +322,29 @@ const reducer = handleActions({
       draft.categoryModal.ordered = true;
     });
   },
-  [RESET]: (state, action) => {
+  [RESET]: () => {
     // resets the state (when leaves write page)
     return initialState;
+  },
+  [SET_UPLOAD_MASK]: (state, { payload: visible }: SetUploadMaskAction) => {
+    return produce(state, (draft) => {
+      draft.upload.mask = visible;
+    });
+  },
+  [SET_TEMP_DATA]: (state, action: SetTempDataAction) => {
+    return produce(state, (draft) => {
+      if (state.body === '') {
+        draft.body = action.payload;
+      }
+      if (state.title === '') {
+        draft.title = action.payload;
+      }
+    });
+  },
+  [SET_INSERT_TEXT]: (state, action) => {
+    return produce(state, (draft) => {
+      draft.insertText = action.payload;
+    });
   },
 }, initialState);
 
