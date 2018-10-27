@@ -40,7 +40,8 @@ module.exports = {
     "prefer-const": 1,
     "linebreak-style": 0,
     "react/jsx-indent": 0,
-    "no-console": 0
+    "no-console": 0,
+    "no-mixed-operators": 0,
   },
   "overrides": {
     "files": ["src/*.js"]

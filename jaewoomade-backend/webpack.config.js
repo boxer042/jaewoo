@@ -28,7 +28,7 @@ module.exports = {
         options: {
           plugins: ['transform-object-rest-spread', 'transform-async-to-generator', 'transform-decorators-legacy'],
           presets: [
-            'flow','stage-0',
+            'flow', 'stage-0',
           ],
         },
       },

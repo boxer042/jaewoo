@@ -29,10 +29,10 @@ class CodeEditorContainer extends Component<Props> {
   onUploadClick = () => {
     const upload = document.createElement('input');
     upload.type = 'file';
-    upload.onchange = () => {
+    upload.onchange = (e) => {
       if (!upload.files) return;
       const file = upload.files[0];
-      console.log(file);
+      this.uploadImage(file);
     };
     upload.click();
   }
@@ -47,6 +47,11 @@ class CodeEditorContainer extends Component<Props> {
   onDragLeave = (e) => {
     e.preventDefault();
     if (!e.relatedTarget) WriteActions.setUploadMask(false);
+  };
+
+  onPasteImage = (file) => {
+    if (!file) return;
+    this.uploadImage(file);
   };
 
   uploadImage = async (file: any) => {
@@ -80,9 +85,12 @@ class CodeEditorContainer extends Component<Props> {
     data.append('post_id', id);
     data.append('image', file);
     try {
+      WriteActions.setUploadStatus(true);
       const response = await axios.post('/files/upload', data, {
         onUploadProgress: (e) => {
-          console.log(`${e.loaded}/${e.total}`);
+          if (window.nanobar) {
+            window.nanobar.go(e.loaded / e.total * 100);
+          }
         },
       });
       const sp = response.data.path.split('/');
@@ -90,7 +98,9 @@ class CodeEditorContainer extends Component<Props> {
         response.data.path
       })${'\n'}`;
       WriteActions.setInsertText(imageUrl);
+      WriteActions.setUploadStatus(false);
     } catch (e) {
+      WriteActions.setUploadStatus(false);
       console.log(e);
     }
   };
@@ -123,7 +133,7 @@ class CodeEditorContainer extends Component<Props> {
   }
 
   render() {
-    const { onEditBody, onDragEnter, onDragLeave, onDrop, onClearInsertText } = this;
+    const { onEditBody, onDragEnter, onDragLeave, onDrop, onClearInsertText, onPasteImage } = this;
     const { body, mask, insertText } = this.props;
     return (
       <Fragment>
@@ -141,6 +151,7 @@ class CodeEditorContainer extends Component<Props> {
           onDragEnter={onDragEnter}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
+          onPaste={onPasteImage}
         />
         <WriteUploadMask visible={mask} />
       </Fragment>

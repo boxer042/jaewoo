@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import type { State } from 'store';
 import type { UserData } from 'store/modules/user';
 import storage from 'lib/storage';
+import NanoBar from 'components/common/NanoBar';
 import FullscreenLoaderContainer from './FullscreenLoaderContainer';
 
 type Props = {
@@ -38,6 +39,7 @@ class Core extends Component<Props> {
     return (
       <Fragment>
         <FullscreenLoaderContainer />
+        <NanoBar />
       </Fragment>
     );
   }

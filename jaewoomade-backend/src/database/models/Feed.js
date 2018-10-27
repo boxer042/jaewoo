@@ -19,11 +19,58 @@ const Feed = db.define(
   {
     indexs: [
       {
-        fields: ['created_at',]
-      }
+        fields: ['created_at'],
+      },
     ],
   },
 );
+
+Feed.findFeedsOf = async ({ userId, cursor }) => {
+  let cursorData = null;
+  try {
+    if (cursor) {
+      cursorData = await Feed.findOne({
+        where: {
+          id: cursor,
+        },
+      });
+      if (!cursorData) {
+        const e = new Error('Cursor data is not found');
+        e.name = 'CURSOR_NOT_FOUND';
+        throw e;
+      }
+    }
+  } catch (e) {
+    throw e;
+  }
+  const feeds = Feed.findAll({
+    include: [
+      {
+        model: Post,
+        include: [
+          {
+            model: User,
+            attributes: ['username'],
+          },
+          Tag,
+          Category,
+        ],
+      },
+    ],
+    where: {
+      fk_user_id: userId,
+      ...(cursor
+        ? {
+          id: { $not: cursor },
+          created_at: { $lte: cursorData && cursorData.created_at },
+        }
+        : {}),
+    },
+    order: [['created_at', 'DESC']],
+    limit: 20,
+  });
+  return feeds;
+};
 
 Feed.associate = function associate() {
   Feed.belongsTo(User, { foreignKey: 'fk_user_id', onDelete: 'CASCADE', onUpdate: 'restrict' });

@@ -1,0 +1,12 @@
+@import "utils";
+.NanoBar {
+}
+
+.nanobar {
+  position: relative;
+  .bar {
+    position: absolute;
+    top: 0;
+    background: $oc-violet-4;
+  }
+}

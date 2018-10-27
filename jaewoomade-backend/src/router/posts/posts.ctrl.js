@@ -2,7 +2,7 @@
 import type { Context } from 'koa';
 import Joi from 'joi';
 import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
-import { 
+import {
   Category,
   Post,
   PostsCategories,
@@ -13,13 +13,35 @@ import {
   Comment,
   FollowUser,
   FollowTag,
+  Feed,
 } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
 import Sequelize from 'sequelize';
 
-async function createFeeds(postId: string, userId: string, tagIds: string[]): Promise<*> {
+type CreateFeedsParams = {
+  postId: string,
+  userId: string,
+  tags: { id: string, name: string }[],
+  username: string,
+};
+
+function convertMapToObject(m: Map<string, *>): any {
+  const obj = {};
+  m.forEach((v, k) => {
+    obj[k] = v;
+  });
+  return obj;
+}
+
+async function createFeeds({
+  postId,
+  userId,
+  tags,
+  username,
+}: CreateFeedsParams): Promise<*> {
   // TODO:
+  const usersMap = new Map();
   // 1. USER FOLLOW
   try {
     const followers = await FollowUser.findAll({
@@ -27,12 +49,45 @@ async function createFeeds(postId: string, userId: string, tagIds: string[]): Pr
       where: { fk_follow_user_id: userId },
       raw: true,
     });
-    console.log(users);
+    followers.forEach(({ fk_user_id }) => {
+      usersMap.set(fk_user_id, [{ type: 'USER', value: username }]);
+    });
   } catch (e) {
     console.log(e);
   }
 
   // 2. TAG FOLLOW (FOR EACH)
+  try {
+    const results = await Promise.all(tags.map(({ id }) => {
+      return FollowTag.findAll({
+        attributes: ['fk_user_id'],
+        where: { fk_tag_id: id },
+        raw: true,
+      });
+    }));
+    results.forEach((followers, i) => {
+      const tagName = tags[i].name;
+      followers.forEach(({ fk_user_id }) => {
+        const exists = usersMap.get(fk_user_id);
+        const reason = { type: 'TAG', value: tagName };
+        if (exists) {
+          exists.push(reason);
+        } else {
+          usersMap.set(fk_user_id, [reason]);
+        }
+      });
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  // console.log(convertMapToObject(usersMap));
+  const userIds = [...usersMap.keys()];
+  const feeds = userIds.map(u => ({
+    fk_post_id: postId,
+    fk_user_id: u,
+    reason: usersMap.get(u),
+  }));
+  await Feed.bulkCreate(feeds);
   // 3. REMOVE DUPLICATE
   // 4. CREATE FEEDS
   // 5. REALTIME.. AWS IOT (Minutely Short Polling)
@@ -121,7 +176,16 @@ export const writePost = async (ctx: Context): Promise<*> => {
     ctx.body = serialized;
 
     if (!isTemp) {
-      createFeeds(postId, ctx.user.id, tagIds);
+      const tagData = tagIds.map((tagId, index) => ({
+        id: tagId,
+        name: uniqueTags[index],
+      }));
+      createFeeds({
+        postId,
+        userId: ctx.user.id,
+        username: ctx.user.username,
+        tags: tagData,
+      });
     }
   } catch (e) {
     ctx.throw(500, e);

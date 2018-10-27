@@ -32,6 +32,8 @@ const TEMP_SAVE = 'write/TEMP_SAVE';
 const SET_UPLOAD_MASK = 'write/SET_UPLOAD_MASK';
 const SET_TEMP_DATA = 'write/SET_TEMP_DATA';
 const SET_INSERT_TEXT = 'write/SET_INSERT_TEXT';
+const SET_UPLOAD_STATUS = 'write/SET_UPLOAD_STATUS';
+const SET_UPLOAD_PROGRESS = 'write/SET_UPLOAD_PROGRESS';
 
 let tempCategoryId = 0;
 
@@ -67,6 +69,8 @@ export interface WriteActionCreators {
   setUploadMask(visible: boolean): any;
   setTempData(): any;
   setInsertText(text: ?string): any;
+  setUploadStatus(uploading: boolean): any;
+  setUploadProgress(progress: number): any;
 }
 
 /* EXPORT ACTION CREATORS */
@@ -101,6 +105,8 @@ export const actionCreators = {
     return tempText;
   }),
   setInsertText: createAction(SET_INSERT_TEXT, (text: ?string) => text),
+  setUploadStatus: createAction(SET_UPLOAD_STATUS, (uploading: boolean) => uploading),
+  setUploadProgress: createAction(SET_UPLOAD_PROGRESS, (progress: number) => progress),
 };
 
 /* STATE TYPES */
@@ -344,6 +350,16 @@ const reducer = handleActions({
   [SET_INSERT_TEXT]: (state, action) => {
     return produce(state, (draft) => {
       draft.insertText = action.payload;
+    });
+  },
+  [SET_UPLOAD_STATUS]: (state, action) => {
+    return produce(state, (draft) => {
+      draft.upload.uploading = action.payload;
+    });
+  },
+  [SET_UPLOAD_PROGRESS]: (state, action) => {
+    return produce(state, (draft) => {
+      draft.upload.progress = action.payload;
     });
   },
 }, initialState);

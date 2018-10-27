@@ -18,7 +18,7 @@ export const upload: Middleware = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = {
       name: 'FILE_NO_GIVEN',
-    }
+    };
     return;
   }
   const { post_id } = fields;
@@ -94,7 +94,7 @@ export const upload: Middleware = async (ctx: Context) => {
         ContentType: image.type,
       }).promise();
       if (!response || !response.ETag) {
-        ctx.status = 418 // I AM A TEAPOT
+        ctx.status = 418; // I AM A TEAPOT
         return;
       }
       postImage.save();
