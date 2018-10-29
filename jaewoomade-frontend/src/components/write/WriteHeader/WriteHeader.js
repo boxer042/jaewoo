@@ -2,12 +2,15 @@
 import React from 'react';
 import BackIcon from 'react-icons/lib/md/arrow-back';
 import MoreIcon from 'react-icons/lib/md/more-vert';
+import CloseIcon from 'react-icons/lib/md/close';
 import cx from 'classnames';
 import './WriteHeader.scss';
 
 type Props = {
   onChangeTitle(e: any): void,
   onOpenSubmitBox(): void,
+  onShowWriteExtra(): void,
+  onHideWriteExtra(): void,
   title: string,
   isEdit: boolean,
   isTemp: boolean,
@@ -16,6 +19,9 @@ type Props = {
 const WriteHeader = ({
   onChangeTitle,
   onOpenSubmitBox,
+  onShowWriteExtra,
+  onHideWriteExtra,
+  writeExtraOpen,
   title,
   isEdit,
   onTempSave,
@@ -38,9 +44,16 @@ const WriteHeader = ({
         <div className={cx('button', isEdit ? 'edit' : 'submit')} onClick={onOpenSubmitBox}>
           {isEdit ? '업데이트' : '작성하기' }
         </div>
-        <div className="more util flex-center">
-          <MoreIcon />
-        </div>
+        {writeExtraOpen && (
+          <div className="ignore-click-outside more util flex-center" onClick={onHideWriteExtra}>
+            <CloseIcon className="ignore-click-outside" />
+          </div>
+        )}
+        {!writeExtraOpen && (
+          <div className="ignore-click-outside more util flex-center" onClick={onShowWriteExtra}>
+            <MoreIcon className="ignore-click-outside" />
+          </div>
+        )}
       </div>
     </div>
   );

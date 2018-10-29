@@ -1,0 +1,70 @@
+@import "utils";
+@keyframes writeExtraAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(25%);
+  }
+  100% {
+    opacity: 1;
+    trasnform: translateX(0px);
+  }
+}
+
+@keyframes writeExtraDisappear {
+  0% {
+    opacity: 1;
+    trasnform: translateX(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(25%);
+  }
+}
+
+.WriteExtra {
+  &.appear {
+    animation: writeExtraAppear 0.15s cubic-bezier(0.49, 0.01, 0.14, 0.86);
+    animation-fill-mode: forwards;
+  }
+  &.disappear {
+    animation: writeExtraDisappear 0.15s cubic-bezier(0.49, 0.01, 0.14, 0.86);
+    animation-fill-mode: forwards;
+  }
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  top: 4rem;
+  width: 16rem;
+  height: calc(100% - 4rem);
+  background: $oc-gray-7;
+  z-index: z("write-extra");
+  @include material-shadow(4, 1);
+  padding: 1rem;
+  .close-button {
+    display: flex;
+    justify-content: flex-end;
+    color: $oc-gray-2;
+    font-size: 1.25rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    &:hover {
+      color: white;
+    }
+  }
+  section {
+    color: white;
+    h4 {
+      margin: 0;
+      margin-bottom: 1rem;
+    }
+    &.full {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  section + section {
+    margin-top: 2rem;
+  }
+}

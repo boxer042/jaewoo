@@ -58,3 +58,8 @@ export type TempSavePayload = {
 export const tempSave = ({ postId, title, body }: TempSavePayload) => {
   axios.post(`/posts/${postId}/saves`, { title, body });
 };
+
+export type CreateUploadUrlPayload = { postId: string, filename: string };
+export const createUploadUrl = ({ postId, filename }: CreateUploadUrlPayload) => {
+  return axios.post('/files/create-url/post-image', { post_id: postId, filename });
+};

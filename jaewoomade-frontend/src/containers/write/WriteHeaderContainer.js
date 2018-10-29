@@ -12,6 +12,7 @@ type Props = {
   postData: ?PostData,
   categories: ?(Category[]),
   tags: string[],
+  writeExtraOpen: boolean,
 };
 
 class WriteHeaderContainer extends Component<Props> {
@@ -64,16 +65,27 @@ class WriteHeaderContainer extends Component<Props> {
     }
   };
 
+  onShowWriteExtra = () => {
+    WriteActions.showWriteExtra();
+  };
+
+  onHideWriteExtra = () => {
+    WriteActions.hideWriteExtra();
+  };
+
   render() {
-    const { onChangeTitle, onOpenSubmitBox, onTempSave } = this;
-    const { title, postData } = this.props;
+    const { onChangeTitle, onOpenSubmitBox, onTempSave, onShowWriteExtra, onHideWriteExtra } = this;
+    const { title, postData, writeExtraOpen } = this.props;
     return (
       <WriteHeader
         onOpenSubmitBox={onOpenSubmitBox}
         onChangeTitle={onChangeTitle}
+        onShowWriteExtra={onShowWriteExtra}
+        onHideWriteExtra={onHideWriteExtra}
         title={title}
         onTempSave={onTempSave}
         isEdit={!!postData && !postData.is_temp}
+        writeExtraOpen={writeExtraOpen}
       />
     );
   }
@@ -86,6 +98,7 @@ export default connect(
     postData: write.postData,
     categories: write.submitBox.categories,
     tags: write.submitBox.tags,
+    writeExtraOpen: write.writeExtra.visible,
   }),
   () => ({}),
 )(WriteHeaderContainer);

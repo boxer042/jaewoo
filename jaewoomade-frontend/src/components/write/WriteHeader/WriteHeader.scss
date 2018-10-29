@@ -1,8 +1,7 @@
-@import 'utils';
-
+@import "utils";
 .WriteHeader {
   position: relative;
-  z-index: z('write-header');
+  z-index: z("write-header");
   height: 4rem;
   background: $oc-gray-8;
   padding-left: 1rem;
@@ -12,13 +11,17 @@
   color: white;
   .back-icon {
     cursor: pointer;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 1.75rem;
-    &:hover, &:active {
+    &:hover,
+    &:active {
       color: white;
     }
   }
   .title-area {
+    @include media("<large") {
+      display: none;
+    }
     flex: 1;
     margin-left: 1rem;
     margin-right: 1rem;
@@ -31,29 +34,55 @@
       font-size: 1.25rem;
       color: white;
       &::placeholder {
-        color: rgba(255,255,255,0.9);
+        color: rgba(255, 255, 255, 0.9);
       }
     }
   }
   .actions {
     display: flex;
     align-items: center;
-
+    @include media("<large") {
+      margin-left: auto;
+    }
+    .upload-image {
+      height: 2.25rem;
+      line-height: 0.875rem;
+      font-size: 0.875rem;
+      padding: 0 0.75rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      &:hover {
+        background: white;
+        color: $oc-gray-9;
+      }
+      svg {
+        font-size: 1.125rem;
+      }
+      display: flex;
+      align-items: center;
+      margin-right: 0.75rem;
+      .btn-text {
+        margin-left: 0.5rem;
+      }
+    }
     .button {
+      height: 2.25rem;
+      display: flex;
+      align-items: center;
       background: $oc-gray-0;
-      padding: 0.6rem;
+      padding: 0 0.75rem;
       font-weight: 500;
       border-radius: 2px;
-      line-height: 0.9rem;
-      font-size: 0.9rem;
+      line-height: 0.875rem;
+      font-size: 0.875rem;
       @include material-shadow(2, 0.75);
       transition: 0.1s all ease-in;
       user-select: none;
       cursor: pointer;
-      & + .button {
+      &+.button {
         margin-left: 0.75rem;
       }
-
       &.temp-save {
         background: #65707b;
         &:hover {
@@ -63,7 +92,6 @@
           background: darken(#65707b, 5%);
         }
       }
-      
       &.submit {
         background: $oc-violet-5;
         color: white;
@@ -74,19 +102,16 @@
           background: $oc-violet-5;
         }
       }
-
       &.edit {
-        background: $oc-indigo-6;
-        color: white;
+        background: $oc-blue-5;
         &:hover {
-          background: lighten($oc-indigo-6, 5%);
+          background: lighten($oc-blue-5, 5%);
         }
         &:active {
-          background: $oc-indigo-6;
+          background: $oc-blue-5;
         }
       }
     }
-
     .more {
       margin-left: 0.75rem;
       width: 2.5rem;
@@ -96,10 +121,10 @@
       cursor: pointer;
       transition: 0.05s all ease-in;
       &:hover {
-        background: rgba(255,255,255,0.125);
+        background: rgba(255, 255, 255, 0.125);
       }
       &:active {
-        background: rgba(255,255,255,0.075);
+        background: rgba(255, 255, 255, 0.075);
       }
     }
   }

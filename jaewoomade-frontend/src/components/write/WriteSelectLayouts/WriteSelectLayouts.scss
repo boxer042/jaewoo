@@ -1,0 +1,42 @@
+@import "utils";
+.WriteSelectLayouts {
+  display: flex;
+
+  .layout-button {
+    &:nth-child(2) {
+      @include media("<large") {
+        display: none;
+      }
+    }
+    // @include unstyle-button();
+    flex: 1;
+    background: $oc-gray-8;
+    border-radius: 2px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 2px solid transparent;
+    cursor: pointer;
+    .text {
+      margin-top: 0.25rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    &:hover {
+      background: lighten($oc-gray-8, 2.5%);
+    }
+    &:not(.active) {
+      opacity: 0.8;
+    }
+    &.active {
+      border: 2px solid rgba(255, 255, 255, 0.9);
+    }
+    & + .layout-button {
+      margin-left: 0.5rem;
+    }
+  }
+}

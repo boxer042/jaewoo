@@ -13,6 +13,10 @@ import getSocialProfile, { type Profile } from 'lib/getSocialProfile';
 import type { UserModel } from 'database/models/User';
 import type { UserProfileModel } from 'database/models/UserProfile';
 import type { EmailAuthModel } from 'database/models/EmailAuth';
+import downloadImage from 'lib/downloadImage';
+import AWS from 'aws-sdk';
+
+const s3 = new AWS.S3({ region: 'ap-northeast-2', signatureVersion: 'v4' });
 
 export const sendAuthEmail = async (ctx: Context): Promise<*> => {
     type BodySchema = {

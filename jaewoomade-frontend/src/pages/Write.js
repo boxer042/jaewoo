@@ -8,21 +8,16 @@ import WriteHeaderContainer from 'containers/write/WriteHeaderContainer';
 import MarkdownPreviewContaner from 'containers/write/MarkdownPreviewContainer';
 import SubmitBoxContainer from 'containers/write/SubmitBoxContainer';
 import CategoryEditModalContainer from 'containers/write/CategoryEditModalContainer';
+import DisablePanesContainer from 'containers/write/DisablePanesContainer';
+import WriteExtraContainer from 'containers/write/WriteExtraContainer';
 
 const Write = () => {
   return (
-    <WriteTemplate
-      header={<WriteHeaderContainer />}
-    >
+    <WriteTemplate header={<WriteHeaderContainer />}>
       <SubmitBoxContainer />
-      <WritePanes
-        left={
-          <CodeEditorContainer />
-        }
-        right={
-          <MarkdownPreviewContaner />
-        }
-      />
+      <WritePanes left={<CodeEditorContainer />} right={<MarkdownPreviewContaner />} />
+      <WriteExtraContainer />
+      <DisablePanesContainer />
       <CategoryEditModalContainer />
     </WriteTemplate>
   );
