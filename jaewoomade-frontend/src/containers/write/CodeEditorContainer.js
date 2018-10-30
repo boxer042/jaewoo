@@ -134,7 +134,7 @@ class CodeEditorContainer extends Component<Props> {
   };
 
   componentWillUnmount() {
-    WriteActions.reset(); // reset Write Module on page leave
+    // WriteActions.reset(); // reset Write Module on page leave
   }
 
   render() {

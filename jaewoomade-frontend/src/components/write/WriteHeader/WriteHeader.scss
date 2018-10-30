@@ -19,9 +19,9 @@
     }
   }
   .title-area {
-    @include media("<large") {
-      display: none;
-    }
+    // @include media("<large") {
+    //   display: none;
+    // }
     flex: 1;
     margin-left: 1rem;
     margin-right: 1rem;

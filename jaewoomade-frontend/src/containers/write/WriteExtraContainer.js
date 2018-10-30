@@ -14,6 +14,14 @@ class WriteExtraContainer extends Component<Props> {
   onSelectLayoutMode = (mode) => {
     WriteActions.setLayoutMode(mode);
   };
+  onClickOutside = (e: SyntheticMouseEvent<any>) => {
+    if (!this.props.visible) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    WriteActions.hideWriteExtra();
+  };
 
   render() {
     const { mode } = this.props;
@@ -21,6 +29,7 @@ class WriteExtraContainer extends Component<Props> {
       <WriteExtra
         visible={this.props.visible}
         onSelectLayoutMode={this.onSelectLayoutMode}
+        onClickOutside={this.onClickOutside}
         mode={mode}
       />
     );

@@ -42,6 +42,7 @@ module.exports = {
     "react/jsx-indent": 0,
     "no-console": 0,
     "no-mixed-operators": 0,
+    "react/no-did-update-set-state": 0,
   },
   "overrides": {
     "files": ["src/*.js"]

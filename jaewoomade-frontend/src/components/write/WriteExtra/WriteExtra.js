@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import cx from 'classnames';
+import withClickOutside from 'react-onclickoutside';
 import WriteSelectLayouts from '../WriteSelectLayouts';
 import './WriteExtra.scss';
 
@@ -63,5 +64,8 @@ class WriteExtra extends Component<Props, State> {
   }
 }
 
-
-export default WriteExtra;
+export default withClickOutside(WriteExtra, {
+  handleClickOutside(instance) {
+    return instance.props.onClickOutside;
+  },
+});

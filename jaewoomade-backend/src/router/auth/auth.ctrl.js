@@ -474,12 +474,33 @@ export const socialRegister = async (ctx: Context): Promise<*> => {
       username,
       email: email || fallbackEmail,
     }).save();
+    // 소셜로그인 썸네일 받아옴
+    let uploadedThumbnail = null;
+    try {
+      const imageData = await downloadImage(thumbnail);
+      const tempPath = `profile/${username}/thumbnails/${new Date().getTime() / 1000}.${imageData.extension}`;
+      const uploadResult = await s3
+        .upload({
+            Bucket: 's3.images.velog.io',
+            Key: tempPath,
+            Body: imageData.stream,
+            ContentType: imageData.contentType,
+          })
+        .promise();
+      if (!uploadResult || !uploadResult.ETag) {
+        throw new Error('upload has failed');
+      }
+      uploadedThumbnail = `https://images.jaewoomade.com/${tempPath}`;
+    } catch (e) {
+      console.log(e);
+      console.log('image sync failed');
+    }
 
     await UserProfile.build({
       fk_user_id: user.id,
       display_name: displayName,
       short_bio: shortBio,
-      thumbnail,
+      thumbnail: uploadedThumbnail,
     }).save();
 
     // create SocialAccount row;
@@ -498,6 +519,9 @@ export const socialRegister = async (ctx: Context): Promise<*> => {
     ctx.cookies.set('access_token', token, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'development'
+        ? undefined
+        : '.jaewoomade.com',
     });
 
     ctx.body = {
@@ -505,7 +529,7 @@ export const socialRegister = async (ctx: Context): Promise<*> => {
         id: user.id,
         username: user.username,
         displayName,
-        thumbnail,
+        thumbnail: uploadedThumbnail,
       },
       token,
     };

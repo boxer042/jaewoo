@@ -12,6 +12,11 @@
     flex: 1;
     display: flex;
     align-items: center;
+    .logo {
+      font-size: 2.25rem;
+      marign-bottom: 2rem;
+      font-family: 'Sedgwick Ave Display', cursive;
+    }
     h1 {
       font-size: 3.5rem;
       font-weight: 500;

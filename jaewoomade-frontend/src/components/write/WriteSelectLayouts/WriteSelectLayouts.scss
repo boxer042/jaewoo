@@ -8,7 +8,7 @@
         display: none;
       }
     }
-    // @include unstyle-button();
+    @include unstyle-button();
     flex: 1;
     background: $oc-gray-8;
     border-radius: 2px;
