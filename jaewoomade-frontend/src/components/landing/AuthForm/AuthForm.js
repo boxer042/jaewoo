@@ -4,6 +4,7 @@ import SocialLoginButton from 'components/landing/SocialLoginButton';
 import CheckIcon from 'react-icons/lib/md/check';
 import Spinner from 'components/common/Spinner';
 import cx from 'classnames';
+import { Link } from 'react-router-dom';
 
 import './AuthForm.scss';
 
@@ -29,7 +30,7 @@ const AuthForm = ({
   onSocialLogin,
 }: Props) => {
   return (
-    <div className="auth-form">
+    <div className="AuthForm">
       {
         sentEmail
           ? (
@@ -62,6 +63,11 @@ const AuthForm = ({
         <SocialLoginButton type="github" onSocialLogin={onSocialLogin} />
         <SocialLoginButton type="google" onSocialLogin={onSocialLogin} />
         <SocialLoginButton type="facebook" onSocialLogin={onSocialLogin} />
+      </div>
+      <div className="explore-wrapper">
+        <Link className="explore" to="/trending">
+          재우메이드 둘러보기
+        </Link>
       </div>
     </div>
   );

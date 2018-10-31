@@ -4,29 +4,26 @@ import './LandingTemplate.scss';
 
 const LandingTemplate = ({ form }) => {
   return (
-      <div className="landing-template">
-      <Responsive className="block">
-          <div className="left-text">
-              <div>
-                  <div className="logo">JAEWOOMADE</div>
-                  <h1>일단은 간단한 블로그<br /> 무슨내용이든 기능부터</h1>
-                  <div className="description">
-                      블로그래 블로그 뭐뭐뭐 넣어야하나. <br />이메일로 시작하기 누르면
-                      가입되어있으면 로그인 페이지로 가고, 가입안되어있으면 회원가입 페이지로 가쟈
-                  </div>
-              </div>
-          </div>
-          <div className="right-form">
-              <div className="black-box">
-                  <h2>로그인 또는 회원가입</h2>
-                  {form}
-              </div>
-              <div className="register-button">
-                  시작하기
-              </div>
-          </div>
-      </Responsive>
+    <div className="LandingTemplate">
+      <div className="left">
+        <div>
+          <div className="logo">JAEWOOMADE</div>
+          <h2>어떤 서비스를 제공해야될까?</h2>
+          <p>지속적으로 정보를 얻고 그 정보로 수익을 창출 할수 있는 플랫폼
+            <br />하나? 두개? 사용자를 많이 이끌 수 있도록 만들어야하나?
+            <br />필요하도록 만들어야한다.
+          </p>
+        </div>
       </div>
+      <div className="right">
+        <div className="wrapper">
+          <h2>2018. JAEWOOMADE</h2>
+          <div className="auth-form">
+            {form}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

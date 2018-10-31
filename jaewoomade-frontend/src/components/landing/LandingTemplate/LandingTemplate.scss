@@ -1,103 +1,184 @@
-@import 'utils';
+@import "utils";
 
-.landing-template {
-  margin-top: 3rem;
-  .block {
-    display: flex;
-    @include media("<large") {
-      flex-direction: column;
+.LandingTemplate {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  @include media("<x-large") {
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    .left,
+    .right {
+      width: 100%;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
-  .left-text {
+  @include media("height<700px") {
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    .left,
+    .right {
+      width: 100%;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  .left {
+    padding-left: 8rem;
+    padding-right: 8rem;
+    @include media("<wide") {
+      padding-left: 6rem;
+      padding-right: 6rem;
+    }
+    @include media("<xx-large") {
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+  .left,
+  .right {
+    height: 100%;
+  }
+  .right {
     flex: 1;
+  }
+  @include media("<x-large") {
+    .left {
+      flex: initial;
+    }
+  }
+  .left {
+    color: white;
+    background: $oc-gray-8;
     display: flex;
     align-items: center;
+    justify-content: center;
+    @include media("<x-large") {
+      justify-content: flex-start;
+    }
     .logo {
-      font-size: 2.25rem;
-      marign-bottom: 2rem;
+      font-size: 3.5rem;
+      line-height: 3.5rem;
       font-family: 'Sedgwick Ave Display', cursive;
     }
-    h1 {
-      font-size: 3.5rem;
-      font-weight: 500;
-      line-height: 1.2em;
-      @include media("<huge") {
-        font-size: 2.85rem;
-      }
-      @include media("<medium") {
-        font-size: 2rem;
+    h2 {
+      margin: 0;
+      margin-top: 4rem;
+      font-weight: 400;
+      font-size: 2rem;
+      line-height: 2rem;
+      @include media("<x-large") {
+        margin-top: 1.5rem;
       }
     }
     p {
-      font-weight: 300;
-      font-size: 1.25rem;
-      @include media("<huge") {
-        font-size: 1rem;
+      font-weight: 400;
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      line-height: 2rem;
+      margin-bottom: 5rem;
+      @include media("<x-large") {
+        margin-bottom: 0;
       }
-      @include media("<medium") {
+    }
+    @include media("<xx-large") {
+      .logo {
+        font-size: 3rem;
+        line-height: 3rem;
+      }
+      h2 {
+        font-size: 1.75rem;
+        line-height: 1.75rem;
+      }
+      p {
         font-size: 1.25rem;
-        br {
-          display: none;
+        line-height: 1.75rem;
+      }
+    }
+    @include media("<medium") {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      .logo {
+        font-size: 2.5rem;
+      }
+      h2 {
+        font-size: 1.25rem;
+        line-height: 1.5rem;
+      }
+      p {
+        font-size: 1rem;
+        line-height: 1.25rem;
+      }
+    }
+    .buttons {
+      display: flex;
+      button {
+        padding: 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        border: 2px solid white;
+        line-height: 1.25rem;
+        border-radius: 2px;
+        cursor: pointer;
+        &:hover {
+          background: white;
+          color: $oc-gray-9;
         }
       }
-
+      button + button {
+        margin-left: 1rem;
+      }
     }
   }
-  .right-form {
-    width: 480px;
-    margin-left: 2rem;
-    margin-top: 2rem;
-    @include media("<large") {
-      margin-left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-    .black-box {
-      h2 {
-        margin: 0;
-        font-weight: 600;
-      }
-      @include media("<medium") {
-        display: none;
-      }
-      border-radius: 4px;
-      width: 100%;
-      background: $oc-gray-8;
-      color: white;
-      padding: 2rem;
-      @include material-shadow(3, 0.75);
-      @include media("<large") {
-        width: calc(100% - 2rem);
+  .right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $oc-gray-1;
+    @include media("<x-large") {
+      align-items: flex-start;
+      & > .wrapper {
+        width: 100%;
       }
     }
-    .register-button {
-      display: none;
-      @include media("<medium") {
-        display: flex;
-      }
-      width: 15rem;
-      background: $oc-gray-8;
-      color: white;
+    h2 {
+      color: $oc-gray-8;
       font-weight: 500;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-      justify-content: center;
-      font-size: 1.5rem;
-      border-radius: 4px;
-
-      transition: box-shadow .15s ease-in;
-      cursor: pointer;
-      border: 2px solid transparent;
-      user-select: none;
-      @include material-shadow(1, 1);
-      @include hover(){ 
-        @include material-shadow(3, 1);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      @include media("<xx-large") {
+        font-size: 1.75rem;
       }
-      &:active {
-        border: 2px solid $oc-gray-9;
-        background: white;
-        color: $oc-gray-9;
+      @include media("<x-large") {
+        font-size: 1.5rem;
+      }
+      @include media("<large") {
+        font-size: 1.25rem;
+      }
+    }
+    .auth-form {
+      padding: 3rem;
+      padding-bottom: 2rem;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid $oc-gray-2; // box-shadow: 0 15px 30px rgba(0, 0, 0, 0.125), 0px 0px 10px rgba(0, 0, 0, 0.11);
+      width: 600px;
+      @include media("<xx-large") {
+        width: 500px;
+      }
+      @include media("<x-large") {
+        width: 100%;
+        padding: 2rem;
+      }
+      @include media("<medium") {
+        padding: 1rem;
       }
     }
   }
