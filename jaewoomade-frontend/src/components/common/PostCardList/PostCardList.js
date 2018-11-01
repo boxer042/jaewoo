@@ -8,24 +8,7 @@ type Props = { }
 
 
 const PostCardList = (props: Props) => (
-  <div className="PostCardList">
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-    <PostCard />
-  </div>
+  <div className="PostCardList" />
 );
 
 

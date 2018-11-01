@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import MainTemplate from 'components/main/MainTemplate';
 import MainTab from 'components/main/MainTab';
 import Trending from 'pages/Trending';
+import Recent from 'pages/Recent';
 import { Switch, Route, withRouter, type ContextRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
@@ -23,7 +24,7 @@ class MainContainer extends Component<Props> {
         <MainHeadContainer />
         <Switch>
           <Route exact path="/(|trending)" component={Trending} />
-          <Route path="/recent" component={Posts} />
+          <Route path="/recent" component={Recent} />
           <Route path="/tags/:tag?" component={Posts} />
         </Switch>
       </MainTemplate>

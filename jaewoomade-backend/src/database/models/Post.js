@@ -2,6 +2,7 @@
 import Sequelize from 'sequelize';
 import db from 'database/db';
 import { User, Tag, Category, UserProfile } from 'database/models';
+import pick from 'lodash/pick';
 
 export type PostModel = {
   id: string,
@@ -43,7 +44,11 @@ const Post = db.define('post', {
   });
 
 Post.associate = function associate() {
-  Post.belongsTo(User, { foreignKey: 'fk_user_id', onDelete: 'restrict', onUpdate: 'restrict' });
+  Post.belongsTo(User, {
+    foreignKey: 'fk_user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'restrict',
+  });
 };
 
 Post.readPost = function (username: string, urlSlug: string) {
@@ -225,13 +230,17 @@ Post.prototype.getCategoryIds = async function (): Promise<*> {
 export const serializePost = (data: any) => {
   const {
     id, title, body, thumbnail, is_markdown, created_at,
-    updated_at, url_slug, likes, comments_count, is_temp,
+    updated_at, url_slug, likes, comments_count, is_temp, user,
   } = data;
   const tags = data.tags.map(tag => tag.name);
   const categories = data.categories.map(category => ({ id: category.id, name: category.name }));
   return {
     id, title, body, thumbnail, is_markdown,
     created_at, updated_at, tags, categories, url_slug, likes, comments_count, is_temp,
+    user: {
+      ...pick(user, ['id', 'username']),
+      ...pick(user.user_profile, ['display_name', 'short_bio', 'thumbnail']),
+    },
   };
 };
 

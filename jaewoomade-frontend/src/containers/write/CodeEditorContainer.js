@@ -91,6 +91,9 @@ class CodeEditorContainer extends Component<Props> {
       WriteActions.setUploadStatus(true);
       if (!this.props.uploadUrl) return;
       await axios.put(this.props.uploadUrl, file, {
+        headers: {
+          'Content-Type': file.type,
+        },
         withCredentials: false,
         onUploadProgress: (e) => {
           if (window.nanobar) {

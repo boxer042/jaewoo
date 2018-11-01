@@ -1,6 +1,7 @@
 // @flow
 import Router from 'koa-router';
 import needsAuth from 'lib/middlewares/needsAuth';
+import { checkUUID } from 'lib/common';
 
 import * as filesCtrl from './files.ctrl';
 
@@ -13,5 +14,6 @@ files.post(
 );
 
 files.post('/upload', needsAuth, filesCtrl.upload);
+files.post('/retrieve-size/:id', checkUUID, filesCtrl.retrieveSize);
 
 export default files;
