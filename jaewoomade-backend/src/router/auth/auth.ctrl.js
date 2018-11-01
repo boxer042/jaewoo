@@ -481,7 +481,7 @@ export const socialRegister = async (ctx: Context): Promise<*> => {
       const tempPath = `profile/${username}/thumbnails/${new Date().getTime() / 1000}.${imageData.extension}`;
       const uploadResult = await s3
         .upload({
-            Bucket: 's3.images.velog.io',
+            Bucket: 's3.images.jaewoomade.com',
             Key: tempPath,
             Body: imageData.stream,
             ContentType: imageData.contentType,
@@ -495,7 +495,6 @@ export const socialRegister = async (ctx: Context): Promise<*> => {
       console.log(e);
       console.log('image sync failed');
     }
-
     await UserProfile.build({
       fk_user_id: user.id,
       display_name: displayName,

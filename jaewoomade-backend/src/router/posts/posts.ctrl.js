@@ -1,7 +1,7 @@
 // @flow
 import type { Context } from 'koa';
 import Joi from 'joi';
-import { validateSchema, filterUnique, generateSlugId, escapeForUrl } from 'lib/common';
+import { validateSchema, filterUnique, generateSlugId, escapeForUrl, isUUID } from 'lib/common';
 import {
   Category,
   Post,
@@ -209,22 +209,30 @@ export const readPost = async (ctx: Context): Promise<*> => {
 
 export const listPosts = async (ctx: Context): Promise<*> => {
   const { username } = ctx.params;
-  const { category, tag, page } = ctx.query;
+  const { category, tag, cursor } = ctx.query;
 
   const query = {
-    username, categoryUrlSlug: category, tag, page: parseInt(page, 10),
+    username, categoryUrlSlug: category, tag, cursor,
   };
+
+  if (cursor && !isUUID(cursor)) {
+    ctx.body = {
+      type: 'INVALIDE_CURSOR_ID',
+    };
+    ctx.status = 400;
+    return;
+  }
 
   try {
     const result = await Post.listPosts(query);
     if (!result.data) {
-      ctx.set('Page-Limit', '1');
       ctx.body = [];
       return;
     }
     ctx.body = result.data.map(serializePost);
+    // const link = `<${ctx.path}?cursor=${result.data[result.data.length - 1].id}>`;
+    // ctx.set('Link', link);
     ctx.set('Count', (result.count).toString());
-    ctx.set('Page-Limit', Math.ceil(result.count / 10).toString());
   } catch (e) {
     ctx.throw(500, e);
   }

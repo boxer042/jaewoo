@@ -1,5 +1,11 @@
-@import 'utils';
+@import "utils";
 
 .MainTemplate {
-
+  margin-left: 18rem;
+  @include media("<x-wide") {
+    margin-left: 15rem;
+  }
+  @include media("<large") {
+    margin-left: 0;
+  }
 }

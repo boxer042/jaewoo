@@ -19,6 +19,7 @@ import {
 
 export function associate() {
   // configure relations
+  User.associate();
   UserProfile.associate();
   SocialAccount.associate();
   Post.associate();

@@ -7,5 +7,7 @@ import registerServiceWorker from './registerServiceWorker';
 
 window.socialAuth = socialAuth;
 
+const render = window.__REDUX_STATE__ ? ReactDOM.hydrate : ReactDOM.render;
+
 ReactDOM.render(<Root />, document.getElementById('root'));
 registerServiceWorker();

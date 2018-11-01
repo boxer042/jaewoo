@@ -1,7 +1,7 @@
 // @flow
 import Sequelize from 'sequelize';
 import db from 'database/db';
-import { User, Tag, Category } from 'database/models';
+import { User, Tag, Category, UserProfile } from 'database/models';
 
 export type PostModel = {
   id: string,
@@ -79,15 +79,27 @@ type PostsQueryInfo = {
   username: ?string,
   tag: ?string,
   categoryUrlSlug: ?string,
-  page: ?number
 };
 
 Post.listPosts = async function ({
   username,
   categoryUrlSlug,
   tag,
-  page,
+  cursor,
 }: PostsQueryInfo) {
+  // fin post with cursor
+  let cursorData = null;
+  if (cursor) {
+    cursorData = await Post.findById(cursor);
+    if (!cursorData) {
+      const e = new Error('Cursor data is no found');
+      e.name = 'CURSOR_NOT_FOUND';
+      throw e;
+    }
+  }
+  const cursorDate = cursorData && cursorData.created_at;
+  const time = cursorDate && new Date(cursorDate).toISOString();
+
   // reusable query for COUNT & SELECT
   const query = `
     ${username ? 'JOIN users u ON p.fk_user_id = u.id' : ''}
@@ -99,31 +111,53 @@ Post.listPosts = async function ({
     ${username ? 'AND u.username = $username' : ''}
     ${tag ? 'AND t.name = $tag' : ''}
     ${categoryUrlSlug ? 'AND c.url_slug = $category' : ''}
+    ${cursor ? `AND p.id != $cursor AND p.created_at <= $time` : ''}
   `;
 
+  const bindVariables = {
+    tag,
+    username,
+    category: categoryUrlSlug,
+    cursor,
+    time,
+  };
+
   try {
-    const countResult = await db.query(`SELECT COUNT(DISTINCT p.id) as count FROM posts p ${query}`, { bind: { tag, username, category: categoryUrlSlug }, type: Sequelize.QueryTypes.SELECT });
+    const countResult = await db.query(
+      `SELECT COUNT(DISTINCT p.id) as count FROM posts p ${query}`,
+      { bind: bindVariables, type: Sequelize.QueryTypes.SELECT },
+      );
     const { count } = countResult[0];
 
     if (!count) return { count: 0, data: null };
 
-    const rows = await db.query(`SELECT DISTINCT p.id, p.created_at FROM posts p
+    const rows = await db.query(
+      `SELECT DISTINCT p.id, p.created_at FROM posts p
       ${query}
       ORDER BY created_at DESC
       LIMIT 10
-      OFFSET ${((page || 1) - 1) * 10}
-    `, { bind: { tag, username, category: categoryUrlSlug }, type: Sequelize.QueryTypes.SELECT });
+    `,
+    { bind: bindVariables, type: Sequelize.QueryTypes.SELECT },
+    );
 
-    if (rows.length === 0) return { count: 0, data: null };
+    if (rows.length === 0) return { count, data: null };
     const postIds = rows.map(({ id }) => id);
 
     const fullPosts = await Post.findAll({
-      include: [User, Tag, Category],
+      include: [
+        {
+          model: User,
+          include: [UserProfile],
+        },
+        Tag,
+        Category,
+      ],
       where: {
         id: {
           $or: postIds,
         },
       },
+      order: [['created_at', 'DESC']],
     });
     return {
       count,

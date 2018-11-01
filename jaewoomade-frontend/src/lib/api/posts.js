@@ -63,3 +63,9 @@ export type CreateUploadUrlPayload = { postId: string, filename: string };
 export const createUploadUrl = ({ postId, filename }: CreateUploadUrlPayload) => {
   return axios.post('/files/create-url/post-image', { post_id: postId, filename });
 };
+
+/* LISTING RELATED... */
+export const getPublicPosts = (cursor: ?string) => {
+  const query = cursor ? `?cursor=${cursor}` : '';
+  return axios.get(`/posts/public${query}`);
+};

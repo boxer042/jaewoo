@@ -2,10 +2,14 @@
 import React, { Component } from 'react';
 import MainTemplate from 'components/main/MainTemplate';
 import MainTab from 'components/main/MainTab';
+import Trending from 'pages/Trending';
+import { Switch, Route, withRouter, type ContextRouter } from 'react-router-dom';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import type { State } from 'store';
 import MainSidebarContainer from './MainSidebarContainer';
 import MainHeadContainer from './MainHeadContainer';
+import Posts from './../../pages/Posts';
 
 type Props = {
   landing: boolean,
@@ -17,15 +21,22 @@ class MainContainer extends Component<Props> {
     return (
       <MainTemplate sidebar={<MainSidebarContainer />}>
         <MainHeadContainer />
-        작은 물고기가뭐지
+        <Switch>
+          <Route exact path="/(|trending)" component={Trending} />
+          <Route path="/recent" component={Posts} />
+          <Route path="/tags/:tag?" component={Posts} />
+        </Switch>
       </MainTemplate>
     );
   }
 }
 
-export default connect(
-  ({ base }: State) => ({
-    landing: base.landing,
-  }),
-  () => ({}),
+export default compose(
+  withRouter,
+  connect(
+    ({ base }: State) => ({
+      landing: base.landing,
+    }),
+    () => ({}),
+  ),
 )(MainContainer);

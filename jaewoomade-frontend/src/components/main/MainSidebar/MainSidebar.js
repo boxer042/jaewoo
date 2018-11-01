@@ -12,7 +12,9 @@ import MainMenuItem from 'components/main/MainMenuItem';
 
 import './MainSidebar.scss';
 
-type Props = { }
+type Props = {
+  url: string,
+}
 
 
 class MainSidebar extends Component<Props> {
@@ -29,15 +31,20 @@ class MainSidebar extends Component<Props> {
           <MainMenuItem
             icon={<TrendingIcon />}
             text="트렌딩"
-            active
+            active={['/', '/trending'].indexOf(url) > -1}
+            to="/trending"
           />
           <MainMenuItem
+            active={url === '/recent'}
             icon={<RecentIcon />}
             text="최근 포스트"
+            to="/recent"
           />
           <MainMenuItem
+            active={/^\/tags/.test(url)}
             icon={<TagIcon />}
             text="태그 목록"
+            to="/tags"
           />
         </ul>
         <div className="placer" />
@@ -48,6 +55,5 @@ class MainSidebar extends Component<Props> {
     );
   }
 }
-
 
 export default MainSidebar;

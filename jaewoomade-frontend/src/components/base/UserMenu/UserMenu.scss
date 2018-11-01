@@ -2,6 +2,7 @@
 
 .user-menu-wrapper {
   position: relative;
+  z-index: z('user-menu');
   .user-menu-positioner {
     position: absolute;
     right: 0;
@@ -25,6 +26,7 @@
       .menu-items {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
+        background: white;
         .separator {
           width: 100%;
           height: 1px;

@@ -67,6 +67,7 @@ class AuthFormContainer extends Component<Props> {
 
         UserActions.setUser(user);
         storage.set(keys.user, user);
+        BaseActions.exitLanding();
       } else {
         const { email, name } = verifySocialResult;
         if (!email || !name) {
@@ -83,8 +84,12 @@ class AuthFormContainer extends Component<Props> {
     BaseActions.setFullscreenLoader(false);
   }
 
+  onExitLanding = () => {
+    BaseActions.exitLanding();
+  }
+
   render() {
-    const { onChange, onSendVerification, onEnterKeyPress, onSocialLogin } = this;
+    const { onChange, onSendVerification, onEnterKeyPress, onSocialLogin, onExitLanding } = this;
     const { email, sentEmail, sending, isUser } = this.props;
 
     return (
@@ -97,6 +102,7 @@ class AuthFormContainer extends Component<Props> {
           onSendVerification={onSendVerification}
           onEnterKeyPress={onEnterKeyPress}
           onSocialLogin={onSocialLogin}
+          onExitLanding={onExitLanding}
         />
     );
   }

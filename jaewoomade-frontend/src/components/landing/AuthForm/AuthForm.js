@@ -13,6 +13,7 @@ type Props = {
   onSendVerification(): Promise<*>,
   onEnterKeyPress(e: KeyboardEvent): void,
   onSocialLogin(provider: string): Promise<*>,
+  onExitLanding(): void,
   email: string,
   sentEmail: boolean,
   sending: boolean,
@@ -28,6 +29,7 @@ const AuthForm = ({
   sending,
   isUser,
   onSocialLogin,
+  onExitLanding,
 }: Props) => {
   return (
     <div className="AuthForm">
@@ -65,7 +67,7 @@ const AuthForm = ({
         <SocialLoginButton type="facebook" onSocialLogin={onSocialLogin} />
       </div>
       <div className="explore-wrapper">
-        <Link className="explore" to="/trending">
+        <Link className="explore" onClick={onExitLanding} to="/trending">
           재우메이드 둘러보기
         </Link>
       </div>

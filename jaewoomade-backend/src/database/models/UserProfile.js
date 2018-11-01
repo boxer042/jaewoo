@@ -23,7 +23,8 @@ const UserProfile = db.define('user_profile', {
 });
 
 UserProfile.associate = function associate() {
-  UserProfile.belongsTo(User, { foreignKey: 'fk_user_id', onDelete: 'restrict', onUpdate: 'restrict' });
+  // UserProfile.belongsTo(User,
+  // { foreignKey: 'fk_user_id', onDelete: 'restrict', onUpdate: 'restrict' });
 };
 
 UserProfile.findByUserId = function findByUserId(userId: string) {

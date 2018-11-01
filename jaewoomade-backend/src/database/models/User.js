@@ -35,6 +35,9 @@ const User = db.define('user', {
 //   const saltRounds: number = 10;
 //   return bcrypt.hash(password, saltRounds);
 // };
+User.associate = function () {
+  User.hasOne(UserProfile, { foreignKey: 'fk_user_id', onDelete: 'CASCADE' });
+};
 
 User.findUser = function findUser(type: 'email' | 'username', value: string) {
   return User.findOne({ where: { [type]: value } });
