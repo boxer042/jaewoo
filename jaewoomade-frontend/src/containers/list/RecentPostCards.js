@@ -7,7 +7,8 @@ import type { PostItem } from 'store/modules/listing';
 import { connect } from 'react-redux';
 
 type Props = {
-
+  posts: ?(PostItem[]),
+  prefetched: ?(PostItem[]),
 };
 
 class RecentPostCards extends Component<Props> {
@@ -31,9 +32,16 @@ class RecentPostCards extends Component<Props> {
 
   render() {
     return (
-      <PostCardList />
+      <PostCardList
+        posts={this.props.posts}
+      />
     );
   }
 }
 
-export default RecentPostCards;
+const mapStateToProps = ({ listing }: State) => ({
+  posts: listing.recent.posts,
+  prefetched: listing.prefetched,
+});
+
+export default connect(mapStateToProps, () => ({}))(RecentPostCards);

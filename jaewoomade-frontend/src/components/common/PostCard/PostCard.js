@@ -7,26 +7,32 @@ import './PostCard.scss';
 type Props = { }
 
 
-const PostCard = (props: Props) => (
+const PostCard = ({ thumbnail, username, userThumbnail, title, body }: Props) => (
   <div className="PostCard">
     <div className="thumbnail-wrapper">
-      <img
-        src="https://shop.r10s.jp/minatodenk/cabinet/001/gz360ez_131024-06.jpg"
-        alt="thumbnail"
-      />
+      {thumbnail ? (
+        <img
+          src={thumbnail}
+          alt={title}
+        />
+      ) : (
+        <div className="image-placeholder">
+          <ImageIcon />
+        </div>
+      )}
       <div className="white-mask" />
     </div>
     <div className="card-content">
       <div className="user-thumbnail-wrapper">
         <img
-          src={defaultThumbnail}
-          alt="@boxer042"
+          src={userThumbnail}
+          alt={username}
         />
       </div>
       <div className="content-head">
-        <div className="username">@boxer042</div>
+        <div className="username">{username}</div>
         <h3>
-        허스크바나 제노아
+          {title}
         </h3>
         <div className="subinfo">
           <span>약 1분전</span>
@@ -34,7 +40,7 @@ const PostCard = (props: Props) => (
         </div>
       </div>
       <div className="description">
-        Lorem viadell poter
+        {body}
       </div>
     </div>
   </div>

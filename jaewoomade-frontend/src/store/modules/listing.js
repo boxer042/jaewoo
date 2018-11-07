@@ -39,10 +39,14 @@ export type PostItem = {
   meta: any,
 };
 
-export type Lisiting = {
-  recentPosts: ?(PostItem[]),
-  prefetched: ?(postItem[]),
+export type ListingSet = {
+  posts: ?(PostItem[]),
+  prefetched: ?(PostItem[]),
   end: boolean,
+};
+
+export type Lisiting = {
+  recent: ListingSet,
 }
 
 type RevealPrefetchedAction = ActionType<typeof actionCreators.revealPrefetched>;
@@ -60,10 +64,14 @@ export interface ListingActionCreators {
   revealPrefetched(type: string): any;
 }
 
-const initialState: Listing = {
-  recentPosts: null,
+const initialListingSet = {
+  posts: null,
   prefetched: null,
   end: false,
+};
+
+const initialState: Listing = {
+  recent: initialListingSet,
 };
 
 const reducer = handleActions(

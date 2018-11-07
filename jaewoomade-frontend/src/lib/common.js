@@ -29,3 +29,5 @@ export type ResponseAction = {
   payload: $AxiosXHR<*>,
   error: $AxiosError<*>
 };
+
+export type ExtractReturn<Fn> = $call<<T>((...Iterable<any>) => T) => T, Fn>;
