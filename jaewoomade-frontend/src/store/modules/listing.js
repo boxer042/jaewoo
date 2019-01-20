@@ -78,11 +78,10 @@ const reducer = handleActions(
   {
     [REVEAL_PREFETCHED]: (state, action: RevealPrefetchedAction) => {
       return produce(state, (draft) => {
-        const { payload } = action;
-        const { posts, prefetched } = draft[payload];
-        if (posts && prefetched) {
-          posts.push(...prefetched);
-          draft[payload].prefetched = null;
+        if (!action) return;
+        if (action.payload === 'recent' && state.recent.posts && state.recent.prefetched) {
+          draft.recent.posts = state.recent.posts.concat(state.recent.prefetched);
+          draft.recent.prefetched = null;
         }
       });
     },

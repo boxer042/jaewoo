@@ -1,6 +1,9 @@
 // @flow
 import { pender } from 'redux-pender';
 import type { $AxiosXHR, $AxiosError } from 'axios';
+import koLocale from 'date-fns/locale/ko';
+import distanceInWords from 'date-fns/distance_in_words';
+import format from 'date-fns/format';
 
 export const pressedEnter = (fn: () => void) => (e: KeyboardEvent) => {
   if (e.key === 'Enter') {
@@ -30,4 +33,45 @@ export type ResponseAction = {
   error: $AxiosError<*>
 };
 
-export type ExtractReturn<Fn> = $call<<T>((...Iterable<any>) => T) => T, Fn>;
+type Return_<R, F: (...args: Array<any>) => R> = R;
+export type Return<T> = Return_<*, T>;
+
+export const getScrollTop = () => {
+  if (!document.body) return 0;
+  const scrollTop = document.documentElement
+    ? document.documentElement.scrollTop || document.body.scrollTop
+    : document.body.scrollTop;
+  return scrollTop;
+};
+export const getScrollBottom = () => {
+  if (!document.body) return 0;
+  const { scrollHeight } = document.body;
+  const { innerHeight } = window;
+  const scrollTop = getScrollTop();
+  return scrollHeight - innerHeight - scrollTop;
+};
+
+export const preventStickBottom = () => {
+  const scrollBottom = getScrollBottom();
+  if (scrollBottom !== 0) return;
+  if (document.documentElement) {
+    document.documentElement.scrollTop -= 1;
+  } else {
+    if (!document.body) return;
+    document.body.scrollTop -= 1;
+  }
+};
+
+export const fromNow = (date: string) => {
+  const now = new Date();
+  const givenDate = new Date(date);
+  const diff = now - givenDate;
+  if (diff < 1000 * 60) {
+    return '방금 전';
+  }
+  if (diff < 1000 * 60 * 60 * 24 * 7) {
+    const distanceString = distanceInWords(now, givenDate, { locale: koLocale, addSuffix: true });
+    return distanceString;
+  }
+  return format(givenDate, 'YYYY년 M월 D일');
+};
