@@ -6,6 +6,7 @@ import UserButton from 'components/base/UserButton';
 import { BaseActions, UserActions } from 'store/actionCreators';
 import withUser, { type WithUserProps } from 'lib/hoc/withUser';
 import { compose } from 'redux';
+import NotificationButton from 'components/base/NotificationButton';
 import UserMenuContainer from './UserMenuContainer';
 
 type Props = {} & WithUserProps;

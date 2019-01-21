@@ -19,6 +19,8 @@ type Props = {
   uploadUrl: ?string,
   imagePath: ?string,
   uploadId: ?string,
+  thumbnail: ?string,
+  categoryModalOpen: boolean,
 }
 
 class CodeEditorContainer extends Component<Props> {
@@ -42,6 +44,7 @@ class CodeEditorContainer extends Component<Props> {
 
   onDragEnter = (e) => {
     e.preventDefault();
+    if (this.props.categoryModalOpen) return;
     setImmediate(() => {
       WriteActions.setUploadMask(true);
     });
@@ -64,7 +67,7 @@ class CodeEditorContainer extends Component<Props> {
     // uploading needs postId
     if (!this.props.postData) {
       await WriteActions.setTempData();
-      const { title, body, tags, categories } = this.props;
+      const { title, body, tags, categories, thumbnail } = this.props;
       const activeCategories = (() => {
         if (!categories || categories.length === 0) return [];
         return categories.filter(c => c.active).map(c => c.id);
@@ -77,6 +80,7 @@ class CodeEditorContainer extends Component<Props> {
           isMarkdown: true,
           isTemp: true,
           categories: activeCategories,
+          thumbnail,
         });
       } catch (e) {
         console.log(e);
@@ -119,6 +123,7 @@ class CodeEditorContainer extends Component<Props> {
 
   onDrop = (e: any) => {
     e.preventDefault();
+    if (this.props.categoryModalOpen) return;
     const { /* items, */ files } = e.dataTransfer;
     // TODO: Some other browser user 'items'
     if (!files) return;
@@ -179,6 +184,8 @@ export default connect(
     uploadUrl: write.upload.uploadUrl,
     imagePath: write.upload.imagePath,
     uploadId: write.upload.uploadId,
+    thumbnail: write.thumbnail,
+    categoryModalOpen: write.categoryModal.open,
   }),
   () => ({}),
 )(CodeEditorContainer);

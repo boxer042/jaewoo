@@ -4,21 +4,26 @@ import MarkdownRender from 'components/common/MarkdownRender';
 import './PostContent.scss';
 
 type Props = {
-  body: string
+  body: string,
+  thumbnail: ?string,
+  onSetToc: (toc: any) => void,
 };
 
-const PostContent = ({ body }: Props) => (
+const PostContent = ({ body, onSetToc, thumbnail }: Props) => (
   <div className="PostContent">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
+    {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none">
       <polygon points="0 0, 100 0, 0 10" fill="#ffffff" />
-    </svg>
-    <div className="wrapper">
-      <div className="floating-box">
-        <img src="https://shop.r10s.jp/minatodenk/cabinet/001/gz360ez_131024-06.jpg" alt="post-thumbnail" />
-        <div className="contents">
-          <MarkdownRender body={body} />
-        </div>
+    </svg> */}
+    {thumbnail && (
+      <div className="post-thumbnail">
+        <img src={thumbnail} alt="" />
       </div>
+    )}
+    <div className="contents">
+      <MarkdownRender
+        body={body}
+        onSetToc={onSetToc}
+      />
     </div>
   </div>
 );

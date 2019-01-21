@@ -10,6 +10,7 @@ type Props = {
   isEditing: boolean,
   selectCategory: any,
   inputTags: any,
+  configureThumbnail: Node,
   visible: boolean,
   isEdit: boolean,
   onClose(): void,
@@ -65,6 +66,7 @@ class SubmitBox extends Component<Props, State> {
     const {
       isEdit, selectCategory, inputTags, visible,
       onSubmit, onEditCategoryClick, onClose,
+      configureThumbnail,
     } = this.props;
     const { animating } = this.state;
     if (!visible && !animating) return null;
@@ -87,10 +89,12 @@ class SubmitBox extends Component<Props, State> {
             {selectCategory}
           </section>
           <section>
-            <div className="section-title">
-              태그설정
-            </div>
+            <div className="section-title">태그설정</div>
             {inputTags}
+          </section>
+          <section>
+            <div className="section-title">썸네일 지정</div>
+            {configureThumbnail}
           </section>
         </div>
         <div className="footer">

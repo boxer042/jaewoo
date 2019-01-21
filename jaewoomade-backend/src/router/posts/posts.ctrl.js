@@ -111,7 +111,7 @@ export const writePost = async (ctx: Context): Promise<*> => {
     title: Joi.string().required().min(1).max(120),
     body: Joi.string().required().min(1),
     shortDescription: Joi.string(),
-    thumbnail: Joi.string(),
+    thumbnail: Joi.string().uri().allow(null),
     isMarkdown: Joi.boolean().required(),
     isTemp: Joi.boolean().required(),
     meta: Joi.object(),

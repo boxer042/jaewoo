@@ -3,11 +3,12 @@ import React, { Component } from 'react';
 import SubmitBox from 'components/write/SubmitBox';
 import SelectCategory from 'components/write/SelectCategory';
 import InputTags from 'components/write/InputTags';
+import WriteConfigureThumbnail from 'components/write/WriteConfigureThumbnail';
 import { connect } from 'react-redux';
 import type { State } from 'store';
 import { WriteActions, UserActions } from 'store/actionCreators';
 import type { Categories, PostData } from 'store/modules/write';
-import type { List } from 'immutable';
+import axios from 'axios';
 
 type Props = {
   open: boolean,
@@ -16,6 +17,10 @@ type Props = {
   title: string,
   body: string,
   postData: ?PostData,
+  uploadUrl: ?string,
+  imagePath: ?string,
+  uploadId: ?string,
+  thumbnail: ?string,
 }
 
 class SubmitBoxContainer extends Component<Props> {
@@ -34,6 +39,69 @@ class SubmitBoxContainer extends Component<Props> {
       this.initialize();
     }
   }
+
+  uploadImage = async (file:any) => {
+    // temp save post if not released
+    if (!this.props.postData) {
+      await WriteActions.setTempData(); // nextTick
+      const { title, body, tags, categories, thumbnail, urlSlug } = this.props;
+      const activeCategories = (() => {
+        if (!categories || categories.length === 0) return [];
+        return categories.filter(c => c.active).map(c => c.id);
+      })();
+      try {
+        await WriteActions.writePost({
+          title,
+          body,
+          tags,
+          isMarkdown: true,
+          isTemp: true,
+          thumbnail,
+          categories: activeCategories,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (!this.props.postData) return;
+    const { id } = this.props.postData;
+    try {
+      await WriteActions.createUploadUrl({ postId: id, filename: file.name });
+      WriteActions.setUploadStatus(true);
+      if (!this.props.uploadUrl) return;
+      await axios.put(this.props.uploadUrl, file, {
+        header: {
+          'Context-Type': file.type,
+        },
+        withCredentials: false,
+        onUploadProgress: (e) => {
+          if (window.nanobar) {
+            window.nanobar.go(e.loaded / e.total * 100);
+          }
+        },
+      });
+      if (!this.props.imagePath) return;
+      WriteActions.setThumbnail(`https://images.jaewoomade.com/${this.props.imagePath}`);
+    } catch (e) {
+      console.log(e);
+    }
+    WriteActions.setUploadStatus(false);
+  };
+
+  onClearThumbnail = () => {
+    WriteActions.setThumbnail(null);
+  };
+
+  onUploadClick = () => {
+    const upload = document.createElement('input');
+    upload.type = 'file';
+    upload.onchange = (e) => {
+      if (!upload.files) return;
+      const file = upload.files[0];
+      this.uploadImage(file);
+    };
+    upload.click();
+  };
   onInsertTag = (tag) => {
     const { tags } = this.props;
     const processedTag = tag.trim();
@@ -55,12 +123,13 @@ class SubmitBoxContainer extends Component<Props> {
     WriteActions.closeSubmitBox();
   }
   onSubmit = async () => {
-    const { categories, tags, title, body, postData } = this.props;
+    const { categories, tags, title, body, postData, thumbnail } = this.props;
 
     try {
       if (postData) { // update if the post already exists
         await WriteActions.updatePost({
           id: postData.id,
+          thumbnail,
           title,
           body,
           tags,
@@ -70,6 +139,7 @@ class SubmitBoxContainer extends Component<Props> {
       } else {
         await WriteActions.writePost({
           title,
+          thumbnail,
           body,
           tags,
           isMarkdown: true,
@@ -84,19 +154,32 @@ class SubmitBoxContainer extends Component<Props> {
 
   render() {
     const {
-      onClose, onToggleCategory, onInsertTag, onRemoveTag,
-      onSubmit, onEditCategoryClick,
+      onClose,
+      onToggleCategory,
+      onInsertTag,
+      onRemoveTag,
+      onSubmit,
+      onEditCategoryClick,
+      onUploadClick,
+      onClearThumbnail,
     } = this;
-    const { open, categories, tags, postData } = this.props;
+    const { open, categories, tags, postData, thumbnail } = this.props;
     return (
       <SubmitBox
         onEditCategoryClick={onEditCategoryClick}
         selectCategory={<SelectCategory categories={categories} onToggle={onToggleCategory} />}
         inputTags={<InputTags tags={tags} onInsert={onInsertTag} onRemove={onRemoveTag} />}
+        configureThumbnail={
+          <WriteConfigureThumbnail
+            thumbnail={thumbnail}
+            onUploadClick={onUploadClick}
+            onClearThumbnail={onClearThumbnail}
+          />
+        }
         visible={open}
         onClose={onClose}
         onSubmit={onSubmit}
-        isEdit={!!postData}
+        isEdit={!!postData && !postData.is_temp}
       />
     );
   }
@@ -110,6 +193,10 @@ export default connect(
     body: write.body,
     title: write.title,
     postData: write.postData,
+    uploadUrl: write.upload.uploadUrl,
+    imagePath: write.upload.imagePath,
+    uploadId: write.upload.id,
+    thumbnail: write.thumbnail,
   }),
   () => ({}),
 )(SubmitBoxContainer);

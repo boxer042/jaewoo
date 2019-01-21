@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import defaultThumbnail from 'static/images/default_thumbnail.png';
+import { Link } from 'react-router-dom';
 import './PostHead.scss';
 
 type Props = {
@@ -14,29 +15,31 @@ type Props = {
   }
 };
 
-const PostHead = ({ title, tags, user }: Props) => (
+const PostHead = ({
+  id,
+  title,
+  tags,
+  user,
+  date,
+}: Props) => (
   <div className="PostHead">
-    <div className="sub-info">
-      <div className="thumbnail util flex-center">
-        <img
-          src={defaultThumbnail}
-          alt="user-thumbnail"
-        />
-      </div>
-      <div className="information">
-        <div>
-          <div className="username">@boxer042</div>
-          <div className="description">안녕하세요. </div>
-          <div className="date-time">Mar 30</div>
-        </div>
+    <div className="userinfo">
+      <Link to="#" className="user-thumbnail">
+        <img src={user.thumbnail || defaultThumbnail} alt="user-thumbnail" />
+      </Link>
+      <div className="info">
+         <Link to="#" className="username">
+           @{user.username}
+         </Link>
+         <div className="description">{user.short_bio}</div>
       </div>
     </div>
     <h1>{title}</h1>
-    <div className="tags">
-      <span className="tag">제노아</span>
-      <span className="tag">허스크바나회사</span>
-      <span className="tag">엔진톱</span>
+    <div className="date-and-likes">
+      <div className="date">{date}</div>
+      <div className="placeholder" />
     </div>
+    <div className="separator" />
   </div>
 );
 

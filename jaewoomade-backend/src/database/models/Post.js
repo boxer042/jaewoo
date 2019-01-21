@@ -56,7 +56,8 @@ Post.readPost = function (username: string, urlSlug: string) {
     attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes'],
     include: [{
       model: User,
-      attributes: ['username'],
+      include: [UserProfile],
+      attributes: ['username', 'id'],
       where: {
         username,
       },
@@ -233,10 +234,25 @@ export const serializePost = (data: any) => {
     updated_at, url_slug, likes, comments_count, is_temp, user,
   } = data;
   const tags = data.tags.map(tag => tag.name);
-  const categories = data.categories.map(category => ({ id: category.id, name: category.name }));
+  const categories = data.categories.map(category => ({
+    id: category.id,
+    name: category.name,
+    url_slug: category.url_slug,
+   }));
   return {
-    id, title, body, thumbnail, is_markdown,
-    created_at, updated_at, tags, categories, url_slug, likes, comments_count, is_temp,
+    id,
+    title,
+    body,
+    thumbnail,
+    is_markdown,
+    created_at,
+    updated_at,
+    tags,
+    categories,
+    url_slug,
+    likes,
+    comments_count,
+    is_temp,
     user: {
       ...pick(user, ['id', 'username']),
       ...pick(user.user_profile, ['display_name', 'short_bio', 'thumbnail']),
