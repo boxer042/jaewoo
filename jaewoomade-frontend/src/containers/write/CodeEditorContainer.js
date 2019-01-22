@@ -44,6 +44,7 @@ class CodeEditorContainer extends Component<Props> {
 
   onDragEnter = (e) => {
     e.preventDefault();
+    if (this.props.submitBoxOpen) return;
     if (this.props.categoryModalOpen) return;
     setImmediate(() => {
       WriteActions.setUploadMask(true);
@@ -62,6 +63,7 @@ class CodeEditorContainer extends Component<Props> {
 
   uploadImage = async (file: any) => {
     WriteActions.setUploadMask(false);
+    if (!file) return;
     // console.log(file);
     // temp save post if there isn't one.
     // uploading needs postId
@@ -186,6 +188,7 @@ export default connect(
     uploadId: write.upload.uploadId,
     thumbnail: write.thumbnail,
     categoryModalOpen: write.categoryModal.open,
+    submitBoxOpen: write.submitBox.open,
   }),
   () => ({}),
 )(CodeEditorContainer);

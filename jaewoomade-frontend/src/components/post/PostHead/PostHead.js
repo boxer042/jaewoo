@@ -2,6 +2,7 @@
 import React from 'react';
 import defaultThumbnail from 'static/images/default_thumbnail.png';
 import { Link } from 'react-router-dom';
+import { fromNow } from 'lib/common';
 import './PostHead.scss';
 
 type Props = {
@@ -36,7 +37,7 @@ const PostHead = ({
     </div>
     <h1>{title}</h1>
     <div className="date-and-likes">
-      <div className="date">{date}</div>
+      <div className="date">{fromNow(date)}</div>
       <div className="placeholder" />
     </div>
     <div className="separator" />

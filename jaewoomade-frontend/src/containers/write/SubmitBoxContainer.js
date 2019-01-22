@@ -9,6 +9,7 @@ import type { State } from 'store';
 import { WriteActions, UserActions } from 'store/actionCreators';
 import type { Categories, PostData } from 'store/modules/write';
 import axios from 'axios';
+import SubmitBoxAdditional from 'components/write/SubmitBoxAdditional';
 
 type Props = {
   open: boolean,
@@ -21,6 +22,7 @@ type Props = {
   imagePath: ?string,
   uploadId: ?string,
   thumbnail: ?string,
+  additional: boolean,
 }
 
 class SubmitBoxContainer extends Component<Props> {
@@ -152,6 +154,16 @@ class SubmitBoxContainer extends Component<Props> {
     }
   }
 
+  onToggleAdditionalConfig = () => {
+    WriteActions.toggleAdditionalConfig();
+  };
+  onCancelAdditionalConfig = () => {
+    WriteActions.toggleAdditionalConfig();
+  };
+  onConfirmAdditionalConfig = () => {
+    WriteActions.toggleAdditionalConfig();
+  };
+
   render() {
     const {
       onClose,
@@ -162,8 +174,11 @@ class SubmitBoxContainer extends Component<Props> {
       onEditCategoryClick,
       onUploadClick,
       onClearThumbnail,
+      onToggleAdditionalConfig,
+      onCancelAdditionalConfig,
+      onConfirmAdditionalConfig,
     } = this;
-    const { open, categories, tags, postData, thumbnail } = this.props;
+    const { open, categories, tags, postData, thumbnail, additional } = this.props;
     return (
       <SubmitBox
         onEditCategoryClick={onEditCategoryClick}
@@ -180,6 +195,15 @@ class SubmitBoxContainer extends Component<Props> {
         onClose={onClose}
         onSubmit={onSubmit}
         isEdit={!!postData && !postData.is_temp}
+        onToggleAdditionalConfig={onToggleAdditionalConfig}
+        additional={
+          additional && (
+            <SubmitBoxAdditional
+              onCancel={onCancelAdditionalConfig}
+              onConfirm={onConfirmAdditionalConfig}
+            />
+          )
+        }
       />
     );
   }
@@ -197,6 +221,7 @@ export default connect(
     imagePath: write.upload.imagePath,
     uploadId: write.upload.id,
     thumbnail: write.thumbnail,
+    additional: write.submitBox.additional,
   }),
   () => ({}),
 )(SubmitBoxContainer);

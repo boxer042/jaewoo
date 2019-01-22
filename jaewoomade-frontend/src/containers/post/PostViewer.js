@@ -5,13 +5,14 @@ import PostTags from 'components/post/PostTags';
 import { PostsActions } from 'store/actionCreators';
 import { connect } from 'react-redux';
 import type { State } from 'store';
-import type { PostData } from 'store/modules/posts';
+import type { PostData, TocItem } from 'store/modules/posts';
 import PostToc from 'components/post/PostToc';
 
 type Props = {
   username: ?string,
   urlSlug: ?string,
   post: ?PostData,
+  activeHeading: ?string,
 };
 
 class PostViewer extends Component<Props> {
@@ -36,15 +37,19 @@ class PostViewer extends Component<Props> {
     PostsActions.setToc(toc);
   };
 
+  onActivateHeading = (headingId: string) => {
+    PostsActions.activateHeading(headingId);
+  }
+
   render() {
-    const { post, toc } = this.props;
-    const { onSetToc } = this;
+    const { post, toc, activeHeading } = this.props;
+    const { onSetToc, onActivateHeading } = this;
 
     if (!post) return null;
 
     return (
       <Fragment>
-        <PostToc toc={toc} />
+        <PostToc toc={toc} activeHeading={activeHeading} />
         <PostHead
           id={post.id}
           date={post.created_at}
@@ -57,6 +62,7 @@ class PostViewer extends Component<Props> {
           thumbnail={post.thumbnail}
           body={post.body}
           onSetToc={onSetToc}
+          onActivateHeading={onActivateHeading}
         />
         <PostTags tags={post.tags} />
       </Fragment>
@@ -68,6 +74,7 @@ export default connect(
   ({ posts }: State) => ({
     post: posts.post,
     toc: posts.toc,
+    activeHeading: posts.activeHeading,
   }),
   () => ({}),
 )(PostViewer);

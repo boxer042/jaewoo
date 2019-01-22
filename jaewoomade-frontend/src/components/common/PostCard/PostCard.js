@@ -30,29 +30,31 @@ const PostCard = ({
   return (
     <div className="PostCard">
       <div className="thumbnail-wrapper">
-        {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt={title}
-          />
-        ) : (
-          <div className="image-placeholder">
-            <ImageIcon />
-          </div>
-        )}
-        <div className="white-mask" />
+        <Link to={link}>
+          {thumbnail ? (
+            <img
+              src={thumbnail}
+              alt={title}
+            />
+          ) : (
+            <div className="image-placeholder">
+              <ImageIcon />
+            </div>
+          )}
+          <div className="white-mask" />
+        </Link>
       </div>
       <div className="card-content">
         <div className="user-thumbnail-wrapper">
           <img
-            src={userThumbnail}
+            src={userThumbnail || defaultThumbnail}
             alt={username}
           />
         </div>
         <div className="content-head">
           <div className="username">{username}</div>
           <h3>
-            <Link to={`/@${username}/${urlSlug}`}>{title}</Link>
+            <Link to={link}>{title}</Link>
           </h3>
           <div className="subinfo">
             <span>{formattedDate}</span>

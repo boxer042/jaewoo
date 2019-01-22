@@ -1,6 +1,8 @@
 // @flow
 import marked from 'marked';
 import React, { Component } from 'react';
+import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce';
 import Prism from 'prismjs';
 import { escapeForUrl, getScrollTop } from 'lib/common';
 import 'prismjs/components/prism-bash.min';
@@ -12,6 +14,7 @@ import './MarkdownRender.scss';
 type Props = {
   body: string,
   onSetToc?: (toc: any) => void,
+  onActivateHeading?: (headingId: string) => void,
 };
 
 type State = {
@@ -23,24 +26,20 @@ function stripHtml(text: string): string {
   return text.replace(regex, '');
 }
 
-const createRenderer = (arr: any[]) => {
-  const renderer = new marked.Renderer();
-  const linkRenderer = renderer.link;
-  renderer.link = (href, title, text) => {
-    const html = linkRenderer.call(renderer, href, title, text);
-    return html.replace(/^<a /, '<a target="_blank" ');
-  };
-  renderer.heading = function heading(text, level, raw) {
+let toc = [];
+const renderer = (() => {
+  const tocRenderer = new marked.Renderer();
+  tocRenderer.heading = function heading(text, level, raw) {
     if (!raw) return '';
     const anchor = this.options.headerPrefix + escapeForUrl(raw.toLowerCase());
-    const hasDuplicate = arr.find(item => item.anchor === anchor);
-    const filtered = arr.filter(item => item.anchor.indexOf(anchor) > -1);
+    const hasDuplicate = toc.find(item => item.anchor === anchor);
+    const filtered = toc.filter(item => item.anchor.indexOf(anchor) > -1);
     const suffix = !hasDuplicate && filtered.length === 0 ? '' : `-${filtered.length + 1}`;
 
     const suffixed = `${anchor}${suffix}`;
-    if (level <= 3 && arr) {
+    if (level <= 3 && toc) {
       try {
-        arr.push({
+        toc.push({
           anchor: suffixed,
           level,
           text: stripHtml(text),
@@ -51,29 +50,32 @@ const createRenderer = (arr: any[]) => {
     }
     return `<h${level} id="${suffixed}">${text}</h${level}>`;
   };
+  return tocRenderer;
+})();
 
-  return renderer;
-};
+marked.setOptions({
+  renderer,
+  gfm: true,
+  tables: true,
+  breaks: true,
+  pedantic: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  xhtml: false,
+});
 
 class MarkdownRender extends Component<Props, State> {
+  positions: { id: string, top: number }[] = [];
+  currentHeading: ?string;
   state = {
     html: '',
   }
 
   renderMarkdown() {
-    const start = new Date();
-    const toc = [];
-    marked.setOptions({
-      renderer: createRenderer(toc),
-      gfm: true,
-      tables: true,
-      breaks: true,
-      pedantic: false,
-      sanitize: false,
-      smartLists: true,
-      smartypants: false,
-      xhtml: false,
-    });
+    if (toc) {
+      toc = [];
+    }
     const rendered = marked(this.props.body);
     if (this.props.onSetToc) {
       this.props.onSetToc(toc);
@@ -85,6 +87,11 @@ class MarkdownRender extends Component<Props, State> {
 
   componentDidMount() {
     this.renderMarkdown();
+    this.registerEvent();
+  }
+
+  componentWillUnmount() {
+    this.unregisterEvent();
   }
 
   renderPrism() {
@@ -92,12 +99,51 @@ class MarkdownRender extends Component<Props, State> {
     Prism.highlightAll();
   }
 
+  onScroll = () => {
+    const scrollTop = getScrollTop();
+    if (!document.body) return;
+    if (!this.positions || this.positions.length === 0) return;
+    for (let i = this.positions.length - 1; i > -1; i -= 1) {
+      const pos = this.positions[i];
+      if (pos.top < scrollTop + 32) {
+        if (pos.id === this.currentHeading) return;
+        this.currentHeading = pos.id;
+        if (!this.props.onActivateHeading) return;
+        this.props.onActivateHeading(pos.id);
+        return;
+      }
+    }
+    // not found, activate the first heading
+    if (!this.props.onActivateHeading) return;
+    this.props.onActivateHeading(this.positions[0].id);
+  };
+
+  registerEvent = () => {
+    if (!this.props.onSetToc) return;
+    window.addEventListener('scroll', this.onScroll);
+  };
+
+  unregisterEvent = () => {
+    window.removeEventListener('scroll', this.onScroll);
+  };
+
+  updatePositions = () => {
+    if (!toc) return;
+    const scrollTop = getScrollTop();
+    this.positions = toc.map(({ anchor }) => {
+      const dom = document.getElementById(anchor);
+      if (!dom) return { top: 0, id: '' };
+      return { top: dom.getBoundingClientRect().top + scrollTop, id: anchor };
+    });
+  };
+
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevProps.body !== this.props.body) {
       this.renderMarkdown();
     }
     if (prevProps.html !== this.state.html) {
       this.renderPrism();
+      this.updatePositions();
     }
   }
 

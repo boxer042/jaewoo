@@ -17,6 +17,7 @@ import {
 } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
+import removeMd from 'remove-markdown';
 import Sequelize from 'sequelize';
 
 type CreateFeedsParams = {
@@ -231,7 +232,8 @@ export const listPosts = async (ctx: Context): Promise<*> => {
     }
     // Fake Delay
     await new Promise((resolve) => { setTimeout(resolve, 2000); });
-    ctx.body = result.data.map(serializePost);
+    ctx.body = result.data.map(serializePost)
+      .map(post => ({ ...post, body: removeMd(post.body).slice(0, 250) }));
     // const link = `<${ctx.path}?cursor=${result.data[result.data.length - 1].id}>`;
     // ctx.set('Link', link);
     ctx.set('Count', (result.count).toString());
