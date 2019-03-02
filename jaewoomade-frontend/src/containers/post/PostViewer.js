@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import type { State } from 'store';
 import type { PostData, TocItem } from 'store/modules/posts';
 import PostToc from 'components/post/PostToc';
+import throttle from 'lodash/throttle';
 
 type Props = {
   username: ?string,
@@ -37,9 +38,9 @@ class PostViewer extends Component<Props> {
     PostsActions.setToc(toc);
   };
 
-  onActivateHeading = (headingId: string) => {
+  onActivateHeading = throttle((headingId: string) => {
     PostsActions.activateHeading(headingId);
-  }
+  }, 250);
 
   render() {
     const { post, toc, activeHeading } = this.props;

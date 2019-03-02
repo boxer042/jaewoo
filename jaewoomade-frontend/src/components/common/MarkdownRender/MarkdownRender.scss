@@ -42,6 +42,18 @@
   &.atom-one {
     @import "prism-atom-one";
   }
+  &.dracula {
+    @import "prism-dracula";
+  }
+  &.github {
+    @import "prism-github";
+  }
+  &.monokai {
+    @import "prism-monokai";
+  }
+  &.duotone-light {
+    @import "prism-duotone-light";
+  }
   h1,
   h2,
   h3,

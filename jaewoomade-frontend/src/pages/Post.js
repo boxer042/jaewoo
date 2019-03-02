@@ -5,6 +5,7 @@ import PostViewer from 'containers/post/PostViewer';
 import { type Match } from 'react-router-dom';
 import ViewerHead from 'components/base/ViewerHead';
 import RightCorner from 'containers/base/RightCorner';
+import PostCommentsContainer from './../containers/post/PostCommentsContainer';
 
 type Props = {
   match: Match
@@ -16,6 +17,7 @@ const Post = ({ match }) => {
       <Fragment>
         <PostTemplate header={<ViewerHead rightCorner={<RightCorner />} />}>
           <PostViewer username={username} urlSlug={urlSlug} />
+          <PostCommentsContainer />
         </PostTemplate>
       </Fragment>
   );

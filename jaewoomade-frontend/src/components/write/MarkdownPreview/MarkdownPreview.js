@@ -8,11 +8,11 @@ type Props = {
   body: string,
 };
 
-const MarkdownPreview = ({ title, body }: Props) => {
+const MarkdownPreview = ({ title, body, theme }: Props) => {
   return (
     <div className="MarkdownPreview" id="preview">
     <h1>{title}</h1>
-      <MarkdownRender body={body} />
+      <MarkdownRender body={body} theme={theme} />
     </div>
   );
 };

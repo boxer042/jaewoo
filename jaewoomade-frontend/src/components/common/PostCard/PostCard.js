@@ -24,6 +24,7 @@ const PostCard = ({
   body,
   date,
   urlSlug,
+  commentsCount,
 }: Props) => {
   const formattedDate = fromNow(date);
   const link = `/@${username}/${urlSlug}`;
@@ -58,7 +59,7 @@ const PostCard = ({
           </h3>
           <div className="subinfo">
             <span>{formattedDate}</span>
-            <span>10개의 댓글</span>
+            <span>{commentsCount}개의 댓글</span>
           </div>
         </div>
         <div className="description">

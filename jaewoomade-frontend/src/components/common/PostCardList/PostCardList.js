@@ -64,6 +64,7 @@ const PostCardList = ({
         body={post.body}
         date={post.created_at}
         urlSlug={post.url_slug}
+        commentsCount={post.comments_count}
       />
     ),
   );

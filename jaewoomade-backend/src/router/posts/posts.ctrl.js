@@ -163,8 +163,8 @@ export const writePost = async (ctx: Context): Promise<*> => {
       is_markdown: isMarkdown,
       is_temp: isTemp,
       fk_user_id: ctx.user.id,
-      meta_json: JSON.stringify(meta),
       url_slug: escapedUrlSlug,
+      meta,
     }).save();
 
     const postId = post.id;
@@ -231,7 +231,7 @@ export const listPosts = async (ctx: Context): Promise<*> => {
       return;
     }
     // Fake Delay
-    await new Promise((resolve) => { setTimeout(resolve, 2000); });
+    // await new Promise((resolve) => { setTimeout(resolve, 2000); });
     ctx.body = result.data.map(serializePost)
       .map(post => ({ ...post, body: removeMd(post.body).slice(0, 250) }));
     // const link = `<${ctx.path}?cursor=${result.data[result.data.length - 1].id}>`;

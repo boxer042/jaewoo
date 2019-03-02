@@ -9,6 +9,7 @@ import type { State } from 'store';
 import { WriteActions, UserActions } from 'store/actionCreators';
 import type { Categories, PostData } from 'store/modules/write';
 import axios from 'axios';
+import storage from 'lib/storage';
 import SubmitBoxAdditional from 'components/write/SubmitBoxAdditional';
 
 type Props = {
@@ -35,6 +36,11 @@ class SubmitBoxContainer extends Component<Props> {
   }
   componentDidMount() {
     this.initialize();
+    const savedCodeTheme = storage.get('codeTheme');
+
+    if (savedCodeTheme) {
+      WriteActions.setMetaValue({ name: 'code_theme', value: savedCodeTheme });
+    }
   }
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.open && this.props.open) {
@@ -125,7 +131,7 @@ class SubmitBoxContainer extends Component<Props> {
     WriteActions.closeSubmitBox();
   }
   onSubmit = async () => {
-    const { categories, tags, title, body, postData, thumbnail } = this.props;
+    const { categories, tags, title, body, postData, thumbnail, meta } = this.props;
 
     try {
       if (postData) { // update if the post already exists
@@ -137,6 +143,7 @@ class SubmitBoxContainer extends Component<Props> {
           tags,
           is_temp: false,
           categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
+          meta,
         });
       } else {
         await WriteActions.writePost({
@@ -147,6 +154,7 @@ class SubmitBoxContainer extends Component<Props> {
           isMarkdown: true,
           isTemp: false,
           categories: categories ? categories.filter(c => c.active).map(c => c.id) : [],
+          meta,
         });
       }
     } catch (e) {
@@ -159,9 +167,18 @@ class SubmitBoxContainer extends Component<Props> {
   };
   onCancelAdditionalConfig = () => {
     WriteActions.toggleAdditionalConfig();
+    WriteActions.resetMeta();
+  };
+  onChangeShortDescription = (e) => {
+    WriteActions.setMetaValue({ name: 'short_description', value: e.target.value });
+  };
+  onChangeCodeTheme = (e: SyntheticInputEvent<HTMLSelectElement>) => {
+    WriteActions.setMetaValue({ name: 'code_theme', value: e.target.value });
   };
   onConfirmAdditionalConfig = () => {
     WriteActions.toggleAdditionalConfig();
+    console.log(this.props.meta.code_theme);
+    storage.set('codeTheme', this.props.meta.code_theme);
   };
 
   render() {
@@ -177,8 +194,10 @@ class SubmitBoxContainer extends Component<Props> {
       onToggleAdditionalConfig,
       onCancelAdditionalConfig,
       onConfirmAdditionalConfig,
+      onChangeShortDescription,
+      onChangeCodeTheme,
     } = this;
-    const { open, categories, tags, postData, thumbnail, additional } = this.props;
+    const { body, open, categories, tags, postData, thumbnail, additional, meta } = this.props;
     return (
       <SubmitBox
         onEditCategoryClick={onEditCategoryClick}
@@ -199,8 +218,13 @@ class SubmitBoxContainer extends Component<Props> {
         additional={
           additional && (
             <SubmitBoxAdditional
+              body={body}
               onCancel={onCancelAdditionalConfig}
               onConfirm={onConfirmAdditionalConfig}
+              meta={meta}
+              realMeta={postData && postData.meta}
+              onChangeShortDescription={onChangeShortDescription}
+              onChangeCodeTheme={onChangeCodeTheme}
             />
           )
         }
@@ -222,6 +246,7 @@ export default connect(
     uploadId: write.upload.id,
     thumbnail: write.thumbnail,
     additional: write.submitBox.additional,
+    meta: write.meta,
   }),
   () => ({}),
 )(SubmitBoxContainer);

@@ -42,6 +42,8 @@ const HIDE_WRITE_EXTRA = 'write/HIDE_WRITE_EXTRA';
 const SET_LAYOUT_MODE = 'write/SET_LAYOUT_MODE';
 
 const TOGGLE_ADDTIONAL_CONFIG = 'write/TOGGLE_ADDTIONAL_CONFIG';
+const SET_META_VALUE = 'write/SET_META_VALUE';
+const RESET_META = 'write/RESET_META';
 
 let tempCategoryId = 0;
 
@@ -49,6 +51,7 @@ let tempCategoryId = 0;
 type EditFieldPayload = { field: string, value: string };
 type ChangeCategoryNamePayload = { id: string, name: string };
 type ReroderCategoryPayload = { from: number, to: number };
+type SetMetaValuePayload = { name: string, value: string };
 
 /* ACTION CREATORS INTERFACE */
 export interface WriteActionCreators {
@@ -81,11 +84,12 @@ export interface WriteActionCreators {
   setUploadStatus(uploading: boolean): any;
   setUploadProgress(progress: number): any;
   createUploadUrl(payload: PostsAPI.CreateUploadUrlPayload): any;
-
   showWriteExtra(): any;
   hideWriteExtra(): any;
   setLayoutMode(mode: string): any;
   toggleAdditionalConfig(): any;
+  setMetaValue(): any;
+  resetMeta(): any;
 }
 
 /* EXPORT ACTION CREATORS */
@@ -124,11 +128,12 @@ export const actionCreators = {
   setUploadStatus: createAction(SET_UPLOAD_STATUS, (uploading: boolean) => uploading),
   setUploadProgress: createAction(SET_UPLOAD_PROGRESS, (progress: number) => progress),
   createUploadUrl: createAction(CREATE_UPLOAD_URL, PostsAPI.createUploadUrl),
-
   showWriteExtra: createAction(SHOW_WRITE_EXTRA),
   hideWriteExtra: createAction(HIDE_WRITE_EXTRA),
   setLayoutMode: createAction(SET_LAYOUT_MODE),
   toggleAdditionalConfig: createAction(TOGGLE_ADDTIONAL_CONFIG),
+  setMetaValue: createAction(SET_META_VALUE, payload => payload),
+  resetMeta: createAction(RESET_META),
 };
 
 /* STATE TYPES */
@@ -171,6 +176,10 @@ export type CategoryModal = {
   ordered: boolean
 };
 
+export type Meta = {
+  code_theme?: string,
+  short_description?: ?string,
+}
 export type PostData = {
   id: string,
   title: string,
@@ -182,7 +191,8 @@ export type PostData = {
   updated_at: string,
   tags: string[],
   categories: { id: string, name: string }[],
-  url_slug: string
+  url_slug: string,
+  meta: Meta,
 };
 export type Upload = {
   mask: boolean,
@@ -200,13 +210,16 @@ export type WriteExtra = {
 export type Write = {
   body: string,
   title: string,
-  submitBox: SumbitBox,
+  thumbnail: ?string,
+  meta: Meta,
+  submitBox: SubmitBox,
   postData: ?PostData,
   categoryModal: CategoryModal,
   upload: Upload,
   insertText: ?string,
   writeExtra: WriteExtra,
   tempSaves: ?(BriefTempSaveInfo[]),
+  changed: boolean,
 };
 
 /* ACTION FLOW TYPE */
@@ -221,11 +234,17 @@ type HideCategoryAction = ActionType<typeof actionCreators.hideCategory>;
 type ReorderCategoryAction = ActionType<typeof actionCreators.reorderCategory>;
 type SetUploadMaskAction = ActionType<typeof actionCreators.setUploadMask>;
 type SetTempDataAction = ActionType<typeof actionCreators.setTempData>;
+type SetMetaValueAction = ActionType<typeof actionCreators.setMetaValue>;
 
 /* INITIAL STATE */
 const initialState: Write = {
   body: '',
   title: '',
+  thumbnail: null,
+  meta: {
+    code_theme: '',
+    short_description: null,
+  },
   submitBox: {
     open: false,
     categories: null,
@@ -425,6 +444,17 @@ const reducer = handleActions({
     return produce(state, (draft) => {
       draft.submitBox.additional = !state.submitBox.additional;
     });
+  },
+  [SET_META_VALUE]: (state, { payload }) => {
+    return produce(state, (draft) => {
+      draft.meta[payload.name] = payload.value;
+    });
+  },
+  [RESET_META]: (state) => {
+    return {
+      ...state,
+      meta: initialState.meta,
+    };
   },
 }, initialState);
 

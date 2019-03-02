@@ -1,14 +1,19 @@
 // @flow
 import marked from 'marked';
 import React, { Component } from 'react';
+import cx from 'classnames';
 import throttle from 'lodash/throttle';
 import debounce from 'lodash/debounce';
 import Prism from 'prismjs';
 import { escapeForUrl, getScrollTop } from 'lib/common';
 import 'prismjs/components/prism-bash.min';
+import 'prismjs/components/prism-typescript.min';
 import 'prismjs/components/prism-javascript.min';
 import 'prismjs/components/prism-jsx.min';
 import 'prismjs/components/prism-css.min';
+import 'prismjs/components/prism-python.min';
+import 'prismjs/components/prism-go.min';
+import 'prismjs/components/prism-scss.min';
 import './MarkdownRender.scss';
 
 type Props = {
@@ -68,9 +73,14 @@ marked.setOptions({
 class MarkdownRender extends Component<Props, State> {
   positions: { id: string, top: number }[] = [];
   currentHeading: ?string;
+
   state = {
     html: '',
   }
+
+  static defaultProps = {
+    theme: 'github',
+  };
 
   renderMarkdown() {
     if (toc) {
@@ -150,9 +160,14 @@ class MarkdownRender extends Component<Props, State> {
   render() {
     const { html } = this.state;
     const markup = { __html: html };
+    const { theme } = this.props;
 
     return (
-      <div className="MarkdownRender atom-one" dangerouslySetInnerHTML={markup} id="markdown-render" />
+      <div
+        className={cx('MarkdownRender', theme || 'github')}
+        id="markdown-render"
+        dangerouslySetInnerHTML={markup}
+      />
     );
   }
 }

@@ -2,7 +2,7 @@
 import Sequelize from 'sequelize';
 import db from 'database/db';
 import { primaryUUID, extractKeys } from 'lib/common';
-import { Post, User } from 'database/models';
+import { Post, User, UserProfile } from 'database/models';
 
 const Comment = db.define('comment', {
   id: primaryUUID,
@@ -68,16 +68,26 @@ Comment.getCommentsCountList = function (postIds: string[]) {
 Comment.readComment = async function (commentId: string) {
   try {
     const data = await Comment.findOne({
-      include: [{
-        model: User,
-        attributes: ['username'],
-      }],
+      include: [
+        {
+          model: User,
+          attributes: ['username'],
+          include: [
+            {
+              model: UserProfile,
+              attributes: ['thumbnail'],
+            },
+          ],
+        },
+      ],
       where: {
         id: commentId,
       },
     });
     if (!data) return null;
-    return this.serialize(data);
+    const serialized = this.serialize(data);
+    serialized.replies_count = await Comment.countChildrenOf(commentId);
+    return serialized;
   } catch (e) {
     throw e;
   }
@@ -110,26 +120,38 @@ Comment.listComments = async function ({
   console.log(offset);
   try {
     const { rows: data, count } = await Comment.findAndCountAll({
-      include: [{ model: User, attributes: ['username'] }],
+      include: [
+        {
+          model: User,
+          attributes: ['username'],
+          include: [
+            {
+              model: UserProfile,
+              attributes: ['thumbnail'],
+            },
+          ],
+        },
+      ],
       where: {
         fk_post_id: postId,
         ...(replyTo ? { reply_to: replyTo } : { level: 0 }),
       },
-      order: [
-        ['created_at', 'DESC'],
-      ],
-      limit: 20,
+      order: [['created_at', 'ASC']],
+      // limit: 20,
       offset,
     });
     if (!data) return [];
     // TODO: Pagination
     const comments = data.map(c => c.toJSON());
     for (let i = 0; i < comments.length; i++) {
-      if (!comments[i].has_replies) continue;
+      if (!comments[i].has_replies) {
+        comments[i].replies_count = 0;
+        continue;
+      }
       comments[i].replies_count = await Comment.countChildrenOf(comments[i].id);
     }
     return {
-      data: comments,
+      data: comments.map(Comment.serialize),
       count,
     };
   } catch (e) {
@@ -154,12 +176,34 @@ Comment.write = function ({
 };
 
 Comment.serialize = (data: any) => {
-  return Object.assign(extractKeys(data, [
-    'id', 'text', 'likes', 'meta_json', 'reply_to',
-    'actual_reply_to', 'level', 'created_at', 'updated_at',
-  ]), {
-    username: data.user.username,
-  });
+  const serialized = Object.assign(
+    extractKeys(data, [
+      'id',
+      'text',
+      'likes',
+      'meta_json',
+      'reply_to',
+      'actual_reply_to',
+      'level',
+      'created_at',
+      'updated_at',
+    ]),
+    {
+      user: {
+        username: data.user.username,
+        thumbnail: data.user.user_profile.thumbnail,
+      },
+      replies_count: data.replies_count || 0,
+    },
+  );
+  if (data.deleted) {
+    serialized.text = null;
+    serialized.user = {
+      username: null,
+      thumbnail: null,
+    };
+  }
+  return serialized;
 };
 
 export default Comment;

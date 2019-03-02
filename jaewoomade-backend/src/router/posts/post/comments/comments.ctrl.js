@@ -60,10 +60,15 @@ export const writeComment: Middleware = async (ctx: Context) => {
 
   try {
     const comment = await Comment.write({
-      postId, userId, text, replyTo: processedReplyTo, level,
+      postId,
+      userId,
+      text,
+      replyTo: processedReplyTo,
+      level,
     });
     if (!comment) {
       ctx.status = 500;
+      return;
     }
     const commentWithUsername = await Comment.readComment(comment.id);
     ctx.body = commentWithUsername;

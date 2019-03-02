@@ -2,6 +2,7 @@
 import { createAction, handleActions, type ActionType } from 'redux-actions';
 import produce from 'immer';
 import * as PostsAPI from 'lib/api/posts';
+import * as CommentsAPI from 'lib/api/posts/comments';
 import { applyPenders, type ResponseAction } from 'lib/common';
 
 export type TocItem = {
@@ -15,6 +16,8 @@ const READ_POST = 'posts/READ_POST';
 const SET_TOC = 'posts/SET_TOC';
 const ACTIVATE_HEADING = 'posts/ACTIVATE_HEADING';
 
+const READ_COMMENTS = 'posts/READ_COMMENTS';
+
 export interface PostsActionCreators {
   readPost(payload: PostsAPI.ReadPostPayload): any;
   setToc(payload: ?(TocItem[])): any;
@@ -25,6 +28,7 @@ export const actionCreators = {
   readPost: createAction(READ_POST, PostsAPI.readPost),
   setToc: createAction(SET_TOC, (toc: ?(TocItem[])) => toc),
   activateHeading: createAction(ACTIVATE_HEADING, (headingId: string) => headingId),
+  readComments: createAction(READ_COMMENTS, CommentsAPI.readComments),
 };
 
 type SetTocAction = ActionType<typeof actionCreators.setToc>;
@@ -64,6 +68,7 @@ const initialState: Posts = {
   post: null,
   toc: null,
   activeHeading: null,
+  comments: null,
 };
 
 const reducer = handleActions({
@@ -87,6 +92,15 @@ export default applyPenders(reducer, [
         if (!action.payload) return;
         draft.post = action.payload.data;
       });
+    },
+  },
+  {
+    type: READ_COMMENTS,
+    onSuccess: (state, action) => {
+      return {
+        ...state,
+        comments: action.payload.data,
+      };
     },
   },
 ]);
