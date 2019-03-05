@@ -1,5 +1,6 @@
 // @flow
 import axios from 'lib/defaultClient';
+import queryString from 'query-string';
 
 export type WritePostPayload = {
   title: string,
@@ -69,4 +70,12 @@ export const createUploadUrl = ({ postId, filename }: CreateUploadUrlPayload) =>
 export const getPublicPosts = (cursor: ?string) => {
   const query = cursor ? `?cursor=${cursor}` : '';
   return axios.get(`/posts/public${query}`);
+};
+
+export const getUserPosts = ({ username, cursor, tag }: GetUserPostsPayload) => {
+  const query = queryString.stringify({
+    cursor,
+    tag,
+  });
+  return axios.get(`/posts/@${username}?${query}`);
 };

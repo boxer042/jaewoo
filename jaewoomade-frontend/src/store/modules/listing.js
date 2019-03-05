@@ -8,10 +8,19 @@ const GET_RECENT_POSTS = 'listing/GET_RECENT_POSTS';
 const PREFETCH_RECENT_POSTS = 'listing/PREFETCH';
 const REVEAL_PREFETCHED = 'listing/REVEAL_PREFETCHED';
 
+const CLEAR_USER_POSTS = 'listing/CLEAR_USER_POSTS';
+const GET_USER_POSTS = 'listing/GET_USER_POSTS';
+
 export const actionCreators = {
   getRecentPosts: createAction(GET_RECENT_POSTS, PostsAPI.getPublicPosts),
   prefetchRecentPosts: createAction(PREFETCH_RECENT_POSTS, PostsAPI.getPublicPosts),
   revealPrefetched: createAction(REVEAL_PREFETCHED, (type: string) => type),
+  clearUserPosts: createAction(CLEAR_USER_POSTS),
+  getUserPosts: createAction(
+    GET_USER_POSTS,
+    PostsAPI.getUserPosts,
+    meta => meta,
+  ),
 };
 
 export type PostItem = {
@@ -72,6 +81,8 @@ const initialListingSet = {
 
 const initialState: Listing = {
   recent: initialListingSet,
+  user: { ...initialListingSet, currentUsername: null, currentTag: null },
+
 };
 
 const reducer = handleActions(
@@ -83,6 +94,17 @@ const reducer = handleActions(
           draft.recent.posts = state.recent.posts.concat(state.recent.prefetched);
           draft.recent.prefetched = null;
         }
+      });
+    },
+    [CLEAR_USER_POSTS]: (state) => {
+      return produce(state, (draft) => {
+        draft.user = {
+          posts: null,
+          prefetched: null,
+          end: false,
+          currentUsername: null,
+          currentTag: null,
+        };
       });
     },
   },
@@ -110,6 +132,27 @@ export default applyPenders(reducer, [
         draft.recent.prefetched = data;
         if (data && data.length === 0) {
           draft.recent.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: GET_USER_POSTS,
+    onPending: (state) => {
+      return produce(state, (draft) => {
+        draft.user.end = false;
+        draft.user.prefetched = null;
+      });
+    },
+    onSuccess: (state, action) => {
+      return produce(state, (draft) => {
+        draft.user.posts = action.payload.data;
+        draft.user.currentUsername = action.meta.username;
+        if (action.meta.tag) {
+          draft.user.currentTag = action.meta.tag;
+        }
+        if (action.payload.data.length < 20) {
+          draft.user.end = true;
         }
       });
     },

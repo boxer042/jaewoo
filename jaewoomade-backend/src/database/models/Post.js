@@ -233,8 +233,19 @@ Post.prototype.getCategoryIds = async function (): Promise<*> {
 
 export const serializePost = (data: any) => {
   const {
-    id, title, body, thumbnail, is_markdown, created_at,
-    updated_at, url_slug, likes, comments_count, is_temp, user,
+    id,
+    title,
+    body,
+    thumbnail,
+    is_markdown,
+    created_at,
+    updated_at,
+    url_slug,
+    liked,
+    likes,
+    comments_count,
+    is_temp,
+    user,
     meta,
   } = data;
   const tags = data.tags.map(tag => tag.name);
@@ -242,7 +253,7 @@ export const serializePost = (data: any) => {
     id: category.id,
     name: category.name,
     url_slug: category.url_slug,
-   }));
+  }));
   return {
     id,
     title,
@@ -262,6 +273,7 @@ export const serializePost = (data: any) => {
       ...pick(user.user_profile, ['display_name', 'short_bio', 'thumbnail']),
     },
     meta,
+    liked,
   };
 };
 
