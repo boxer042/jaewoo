@@ -25,6 +25,7 @@ class PostComment extends Component {
   }
 
   onOpen = () => {
+    this.readReplies();
     this.setState({
       open: true,
       showInput: false,
@@ -49,6 +50,29 @@ class PostComment extends Component {
     });
   };
 
+  readReplies = () => {
+    const { onReadReplies, id, parentId } = this.props;
+    onReadReplies(id, parentId);
+  };
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    const compare = (key) => {
+      return nextProps[key] !== this.props[key];
+    };
+
+    return (
+      this.state !== nextState ||
+      compare('replies') ||
+      compare('comment') ||
+      compare('repliesCount') ||
+      compare('subcommentsMap')
+    );
+  }
+
+  onReply = (text: string, replyTo?: ?string) => {
+    return this.props.onReply(text, replyTo, this.props.parentId);
+  };
+
   render() {
     const {
       username,
@@ -57,6 +81,12 @@ class PostComment extends Component {
       date,
       repliesCount,
       level,
+      id,
+      onReply,
+      replies,
+      subcommentsMap,
+      onReadReplies,
+      logged,
     } = this.props;
 
     const { open, showInput, editing } = this.state;
@@ -65,7 +95,6 @@ class PostComment extends Component {
 
     return (
       <div className="PostComment">
-        {/* <PostCommentInput /> */}
         <Fragment>
         <div className="comment-head">
           <Link to={userProfileLink}>
@@ -89,6 +118,7 @@ class PostComment extends Component {
               숨기기
             </button>
           ) : (
+            (logged || repliesCount > 0) &&
             (comment || repliesCount > 0) && (
               <button className="replies-button" onClick={this.onOpen}>
                 <PlusIcon />
@@ -98,21 +128,40 @@ class PostComment extends Component {
           ))}
           {open && (
             <section className="replies">
-              <PostComment
-                username="JAEWOO"
-                date="2019.3.2"
-                comment="이것이 댓글대글댓글"
-                level={level + 1}
-              />
+              {replies &&
+              replies.map((reply) => {
+                return (
+                  <PostComment
+                    logged={logged}
+                    key={reply.id}
+                    id={reply.id}
+                    username={reply.user.username}
+                    thumbnail={reply.user.thumbnail}
+                    comment={reply.text}
+                    date={reply.created_at}
+                    replies={subcommentsMap[reply.id]}
+                    repliesCount={reply.replies_count}
+                    subcommentsMap={subcommentsMap}
+                    onReadReplies={onReadReplies}
+                    onReply={onReply}
+                    level={level + 1}
+                    parentId={id}
+                  />
+                );
+              })}
             {showInput ? (
               <PostCommentInput
                 showCancel
                 onCancel={this.onHideInput}
+                onWriteComment={this.onReply}
+                replyTo={id}
               />
             ) : (
-              <button className="show-input-button" onClick={this.onShowInput}>
+              logged && (
+                <button className="show-input-button" onClick={this.onShowInput}>
                   답글 작성하기
-              </button>
+                </button>
+              )
             )}
             </section>
           )}

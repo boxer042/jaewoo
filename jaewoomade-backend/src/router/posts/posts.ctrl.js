@@ -14,6 +14,7 @@ import {
   FollowUser,
   FollowTag,
   Feed,
+  PostLike,
 } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
@@ -201,8 +202,21 @@ export const readPost = async (ctx: Context): Promise<*> => {
       ctx.status = 404;
       return;
     }
+
     const commentsCount = await Comment.getCommentsCount(post.id);
-    ctx.body = serializePost({ ...post.toJSON(), comments_count: commentsCount });
+    let liked = false;
+    if (ctx.user) {
+      const exists = await PostLike.checkExists({
+        userId: ctx.user.id,
+        postId: post.id,
+      });
+      liked = !!exists;
+    }
+    ctx.body = serializePost({
+      ...post.toJSON(),
+      comments_count: commentsCount,
+      liked,
+      });
   } catch (e) {
     ctx.throw(500, e);
   }

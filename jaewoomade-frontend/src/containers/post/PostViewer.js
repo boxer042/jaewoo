@@ -42,15 +42,30 @@ class PostViewer extends Component<Props> {
     PostsActions.activateHeading(headingId);
   }, 250);
 
+  onToggleLike = () => {
+    const { post, likeInProcess } = this.props;
+    if (likeInProcess) return;
+    if (!post) return;
+    if (post.liked) {
+      PostsActions.unlike(post.id);
+    } else {
+      PostsActions.like(post.id);
+    }
+  };
+
   render() {
-    const { post, toc, activeHeading } = this.props;
+    const { post, toc, activeHeading, logged } = this.props;
     const { onSetToc, onActivateHeading } = this;
 
     if (!post) return null;
 
     return (
       <Fragment>
-        <PostToc toc={toc} activeHeading={activeHeading} />
+        <PostToc
+          toc={toc}
+          activeHeading={activeHeading}
+          onActivateHeading={this.onActivateHeading}
+        />
         <PostHead
           id={post.id}
           date={post.created_at}
@@ -58,6 +73,10 @@ class PostViewer extends Component<Props> {
           tags={post.tags}
           categories={post.categories}
           user={post.user}
+          likes={post.likes}
+          liked={post.liked}
+          onToggleLike={this.onToggleLike}
+          logged={logged}
         />
         <PostContent
           thumbnail={post.thumbnail}
@@ -72,10 +91,12 @@ class PostViewer extends Component<Props> {
 }
 
 export default connect(
-  ({ posts }: State) => ({
+  ({ posts, pender, user }: State) => ({
     post: posts.post,
     toc: posts.toc,
     activeHeading: posts.activeHeading,
+    likeInProcess: pender.pending['posts/LIKE'] || pender.pending['posts/UNLIKE'],
+    logged: !!user.user,
   }),
   () => ({}),
 )(PostViewer);

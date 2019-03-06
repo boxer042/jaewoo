@@ -34,6 +34,22 @@ class PostCommentInput extends Component {
     });
   };
 
+  onWriteButtonClick = async () => {
+    const { onWriteComment, replyTo } = this.props;
+    const { input } = this.state;
+    try {
+      this.setState({
+        input: '',
+      });
+      if (this.props.onCancel) {
+        this.props.onCancel();
+      }
+      await onWriteComment(input, replyTo);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   render() {
     const { showCancel, onCancel } = this.props;
     const { focused, input, waiting } = this.state;
@@ -48,7 +64,7 @@ class PostCommentInput extends Component {
           value={input}
         />
         <div className="button-wrapper">
-          <Button>댓글 작성</Button>
+          <Button onClick={this.onWriteButtonClick}>댓글 작성</Button>
           {showCancel && (
             <Button cancel onMouseDown={onCancel}>
               취소

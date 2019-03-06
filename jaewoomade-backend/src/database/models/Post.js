@@ -56,7 +56,17 @@ Post.associate = function associate() {
 
 Post.readPost = function (username: string, urlSlug: string) {
   return Post.findOne({
-    attributes: ['id', 'title', 'body', 'thumbnail', 'is_markdown', 'created_at', 'updated_at', 'url_slug', 'likes', 'meta'],
+    attributes: [
+      'id',
+      'title',
+      'body',
+      'thumbnail',
+      'is_markdown',
+      'created_at',
+      'updated_at',
+      'url_slug',
+      'likes',
+      'meta'],
     include: [{
       model: User,
       include: [UserProfile],
@@ -189,12 +199,12 @@ Post.chekUrlSlugExistancy = function ({
   });
 };
 
-Post.prototype.like = async function like(): Promise<*> {
-  return this.increment('likes', { by: 1 });
+Post.prototype.like = async function like(transaction): Promise<*> {
+  return this.increment('likes', { by: 1, transaction });
 };
 
-Post.prototype.unlike = async function like(): Promise<*> {
-  return this.decrement('likes', { by: 1 });
+Post.prototype.unlike = async function unlike(transaction): Promise<*> {
+  return this.decrement('likes', { by: 1, transaction });
 };
 
 Post.prototype.getTagNames = async function (): Promise<*> {
