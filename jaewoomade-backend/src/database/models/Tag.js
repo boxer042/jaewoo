@@ -16,6 +16,29 @@ const Tag = db.define('tag', {
   },
 });
 
+Tag.findByName = async (name: string) => {
+  return Tag.findOne({
+    where: {
+      // $FlowFixMe
+      [Sequelize.Op.or]: [
+        Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('name')),
+          Sequelize.fn('lower', name),
+        ),
+        Sequelize.where(
+          Sequelize.fn(
+            'replace',
+            Sequelize.fn('lower', Sequelize.col('name')),
+            ' ',
+            '-',
+          ),
+          Sequelize.fn('replace', Sequelize.fn('lower', name), ' ', '-'),
+        ),
+      ],
+    },
+  });
+};
+
 // gets tag id if exists, create one if !exists.
 Tag.getId = async function getId(name: string) {
   try {

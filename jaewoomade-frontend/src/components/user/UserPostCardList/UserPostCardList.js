@@ -10,6 +10,7 @@ type Props = {
 };
 
 const UserPostCardList = ({ posts, username }: Props) => {
+  if (!posts) return null;
   const postList = posts.map(post => (
     <UserPostCard username={username} key={post.id} post={post} />
   ));

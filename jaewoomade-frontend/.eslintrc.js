@@ -43,6 +43,8 @@ module.exports = {
     "no-console": 0,
     "no-mixed-operators": 0,
     "react/no-did-update-set-state": 0,
+    camelcase: 0,
+    "arrow-parens": 0,
   },
   "overrides": {
     "files": ["src/*.js"]

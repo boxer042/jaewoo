@@ -10,6 +10,7 @@ const REVEAL_PREFETCHED = 'listing/REVEAL_PREFETCHED';
 
 const CLEAR_USER_POSTS = 'listing/CLEAR_USER_POSTS';
 const GET_USER_POSTS = 'listing/GET_USER_POSTS';
+const PREFETCH_USER_POSTS = 'listing/PREFETCH_USER_POSTS';
 
 export const actionCreators = {
   getRecentPosts: createAction(GET_RECENT_POSTS, PostsAPI.getPublicPosts),
@@ -21,6 +22,7 @@ export const actionCreators = {
     PostsAPI.getUserPosts,
     meta => meta,
   ),
+  prefetchUserPosts: createAction(PREFETCH_USER_POSTS, PostsAPI.getUserPosts),
 };
 
 export type PostItem = {
@@ -89,10 +91,11 @@ const reducer = handleActions(
   {
     [REVEAL_PREFETCHED]: (state, action: RevealPrefetchedAction) => {
       return produce(state, (draft) => {
-        if (!action) return;
-        if (action.payload === 'recent' && state.recent.posts && state.recent.prefetched) {
-          draft.recent.posts = state.recent.posts.concat(state.recent.prefetched);
-          draft.recent.prefetched = null;
+        const { payload } = action;
+        const { posts, prefetched } = draft[payload];
+        if (posts && prefetched) {
+          posts.push(...prefetched);
+          draft[payload].prefetched = null;
         }
       });
     },
@@ -152,6 +155,18 @@ export default applyPenders(reducer, [
           draft.user.currentTag = action.meta.tag;
         }
         if (action.payload.data.length < 20) {
+          draft.user.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: PREFETCH_USER_POSTS,
+    onSuccess: (state, action) => {
+      const { data } = action.payload;
+      return produce(state, (draft) => {
+        draft.user.prefetched = data;
+        if (data && data.length === 0) {
           draft.user.end = true;
         }
       });
