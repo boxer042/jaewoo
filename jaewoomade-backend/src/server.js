@@ -13,6 +13,7 @@ export default class Server {
   app: Koa;
 
   constructor() {
+    associate();
     this.app = new Koa();
     this.middleware();
     this.initializeDb();
@@ -21,7 +22,6 @@ export default class Server {
   initializeDb(): void {
     db.authenticate().then(
       () => {
-        associate();
         console.log('DB Connection has been established');
       },
       (err) => {

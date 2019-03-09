@@ -53,7 +53,9 @@ const PostCard = ({
           />
         </div>
         <div className="content-head">
-          <div className="username">{username}</div>
+          <Link to={`/@${username}`} className="username">
+              {username}
+          </Link>
           <h3>
             <Link to={link}>{title}</Link>
           </h3>

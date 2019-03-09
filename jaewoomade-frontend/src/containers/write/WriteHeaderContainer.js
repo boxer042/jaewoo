@@ -5,6 +5,8 @@ import type { State } from 'store';
 import { WriteActions } from 'store/actionCreators';
 import WriteHeader from 'components/write/WriteHeader';
 import type { PostData } from 'store/modules/write';
+import { compose } from 'redux';
+import { withRouter } from 'react-router-dom';
 
 type Props = {
   title: string,
@@ -73,6 +75,10 @@ class WriteHeaderContainer extends Component<Props> {
     WriteActions.hideWriteExtra();
   };
 
+  onGoBack = () => {
+    this.props.history.goBack();
+  };
+
   render() {
     const { onChangeTitle, onOpenSubmitBox, onTempSave, onShowWriteExtra, onHideWriteExtra } = this;
     const { title, postData, writeExtraOpen } = this.props;
@@ -86,19 +92,23 @@ class WriteHeaderContainer extends Component<Props> {
         onTempSave={onTempSave}
         isEdit={!!postData && !postData.is_temp}
         writeExtraOpen={writeExtraOpen}
+        onGoBack={this.onGoBack}
       />
     );
   }
 }
 
-export default connect(
-  ({ write }: State) => ({
-    title: write.title,
-    body: write.body,
-    postData: write.postData,
-    categories: write.submitBox.categories,
-    tags: write.submitBox.tags,
-    writeExtraOpen: write.writeExtra.visible,
-  }),
-  () => ({}),
+export default compose(
+  withRouter,
+  connect(
+    ({ write }: State) => ({
+      title: write.title,
+      body: write.body,
+      postData: write.postData,
+      categories: write.submitBox.categories,
+      tags: write.submitBox.tags,
+      writeExtraOpen: write.writeExtra.visible,
+    }),
+    () => ({}),
+  ),
 )(WriteHeaderContainer);

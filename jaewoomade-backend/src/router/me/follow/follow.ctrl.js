@@ -115,6 +115,32 @@ export const followUser: Middleware = async (ctx: Context) => {
   }
 };
 
+export const unfollowUser: Middleware = async (ctx: Context) => {
+  const { id: userId } = ctx.user;
+  const followUserId = ctx.params.id;
+
+  try {
+    // check follow existancy
+    const follow = await FollowUser.findOne({
+      where: {
+        fk_user_id: userId,
+        fk_follow_user_id: followUserId,
+      },
+    });
+    if (!follow) {
+      ctx.body = {
+        name: 'NOT_FOLLOWING',
+      };
+      ctx.status = 409;
+      return;
+    }
+    await follow.destroy();
+    ctx.status = 204;
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
 export const getFollowTagStatus: Middleware = async (ctx: Context) => {
   const { id: userId } = ctx.user;
   const tagId = ctx.params.id;

@@ -2,6 +2,7 @@
 import Sequelize from 'sequelize';
 import Joi from 'joi';
 import type { Middleware } from 'koa';
+import crypto from 'crypto';
 
 export const primaryUUID = {
   type: Sequelize.UUID,
@@ -71,3 +72,12 @@ export const extractKeys = (object: any, params: Array<string>): any => {
 //       .replace(/#/g, '') + (replaced.length > 200 ? '...' : '')
 //   );
 // }
+export function generalHash(text: string) {
+  const hashKey = process.env.HASH_KEY;
+  if (!hashKey) return null;
+  const hash = crypto
+    .createHmac('sha256', hashKey)
+    .update(text)
+    .digest('hex');
+  return hash;
+}

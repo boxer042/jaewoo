@@ -1,3 +1,4 @@
+import db from 'database/db';
 import {
   EmailAuth,
   User,
@@ -15,7 +16,10 @@ import {
   PostHistory,
   PostImage,
   Feed,
+  PostScore,
+  PostRead,
 } from './models';
+import * as views from './views';
 
 export function associate() {
   // configure relations
@@ -33,24 +37,28 @@ export function associate() {
   PostHistory.associate();
   PostImage.associate();
   Feed.associate();
+  PostScore.associate();
+  PostRead.associate();
 }
 
 export default function sync() {
   associate();
-  User.sync();
-  UserProfile.sync();
-  SocialAccount.sync();
-  EmailAuth.sync();
-  Post.sync();
-  Category.sync();
-  PostsCategories.sync();
-  Tag.sync();
-  PostsTags.sync();
-  PostLike.sync();
-  Comment.sync();
-  FollowUser.sync();
-  FollowTag.sync();
-  PostHistory.sync();
-  PostImage.sync();
-  Feed.sync();
+  db.sync();
+  // UserProfile.sync();
+  // SocialAccount.sync();
+  // EmailAuth.sync();
+  // Post.sync();
+  // Category.sync();
+  // PostsCategories.sync();
+  // Tag.sync();
+  // PostsTags.sync();
+  // PostLike.sync();
+  // Comment.sync();
+  // FollowUser.sync();
+  // FollowTag.sync();
+  // PostHistory.sync();
+  // PostImage.sync();
+  // Feed.sync();
+  // PostScore.sync();
+  // PostRead.sync();
 }

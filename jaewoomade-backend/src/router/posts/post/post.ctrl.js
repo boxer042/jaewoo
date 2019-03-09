@@ -53,6 +53,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
     url_slug: string,
     thumbnail: string,
     is_temp: boolean,
+    meta: any,
   }
 
   const schema = Joi.object().keys({
@@ -63,6 +64,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
     categories: Joi.array().items(Joi.string()),
     tags: Joi.array().items(Joi.string()),
     url_slug: Joi.string().max(130),
+    meta: Joi.object(),
   });
 
   if (!validateSchema(ctx, schema)) {
@@ -77,6 +79,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
     url_slug: urlSlug,
     thumbnail,
     is_temp: isTemp,
+    meta,
   }: BodySchema = (ctx.request.body: any);
 
   const generatedUrlSlug = `${title} ${generateSlugId()}`;
@@ -107,6 +110,7 @@ export const updatePost = async (ctx: Context): Promise<*> => {
       url_slug: urlSlugShouldChange && escapedUrlSlug,
       thumbnail,
       is_temp: isTemp,
+      meta,
   };
 
   Object.keys(updateQuery).forEach((key) => {

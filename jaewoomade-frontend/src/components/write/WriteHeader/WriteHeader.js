@@ -25,10 +25,11 @@ const WriteHeader = ({
   title,
   isEdit,
   onTempSave,
+  onGoBack,
 }: Props) => {
   return (
     <div className="WriteHeader">
-      <BackIcon className="back-icon" />
+      <BackIcon className="back-icon" onClick={onGoBack} />
       <div className="title-area">
         <input
           placeholder="제목을 입력해주세요."

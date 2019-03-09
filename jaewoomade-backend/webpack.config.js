@@ -1,6 +1,7 @@
 const path = require('path');
 // eslint-disable-next-line import/no-unresolved
 const slsw = require('serverless-webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
@@ -28,7 +29,7 @@ module.exports = {
         options: {
           plugins: ['transform-object-rest-spread', 'transform-async-to-generator', 'transform-decorators-legacy'],
           presets: [
-            'flow', 'stage-1',
+            'flow',
           ],
         },
       },
@@ -40,6 +41,7 @@ module.exports = {
     filename: '[name].js',
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new webpack.DefinePlugin({ 'global.GENTLY': false }),
   ],
 };

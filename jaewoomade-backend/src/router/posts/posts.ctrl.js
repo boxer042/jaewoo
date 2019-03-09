@@ -1,7 +1,7 @@
 // @flow
 import type { Context } from 'koa';
 import Joi from 'joi';
-import { validateSchema, filterUnique, generateSlugId, escapeForUrl, isUUID } from 'lib/common';
+import { validateSchema, filterUnique, generateSlugId, escapeForUrl, isUUID, generalHash } from 'lib/common';
 import {
   Category,
   Post,
@@ -15,11 +15,16 @@ import {
   FollowTag,
   Feed,
   PostLike,
+  PostScore,
+  PostRead,
 } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
 import removeMd from 'remove-markdown';
 import Sequelize from 'sequelize';
+import { TYPES } from 'database/models/PostScore';
+
+const { Op } = Sequelize;
 
 type CreateFeedsParams = {
   postId: string,
@@ -127,7 +132,10 @@ export const writePost = async (ctx: Context): Promise<*> => {
   }
 
   const {
-    title, body, shortDescription, thumbnail,
+    title,
+    body,
+    shortDescription,
+    thumbnail,
     isMarkdown, isTemp, meta, categories, tags, urlSlug,
   }: BodySchema = (ctx.request.body: any);
 
@@ -217,6 +225,37 @@ export const readPost = async (ctx: Context): Promise<*> => {
       comments_count: commentsCount,
       liked,
       });
+    const hash = generalHash(ctx.request.ip);
+    const userId = ctx.user ? ctx.user.id : null;
+
+    const postRead = await PostRead.findOne({
+      where: {
+        ip_hash: hash,
+        fk_post_id: post.id,
+        created_at: {
+          // $FlowFixMe
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+    if (postRead) {
+      return;
+    }
+
+    await PostRead.create({
+        ip_hash: hash,
+        fk_post_id: post.id,
+        fk_user_id: userId,
+    });
+    await post.increment('views', { by: 1 });
+    if (post.views % 10 === 0) {
+      await PostScore.create({
+        type: TYPES.READ,
+        fk_user_id: null,
+        fk_post_id: post.id,
+        score: 0.125,
+      });
+    }
   } catch (e) {
     ctx.throw(500, e);
   }

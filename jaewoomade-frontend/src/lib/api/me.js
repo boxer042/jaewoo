@@ -25,3 +25,7 @@ export const reorderCategories = (categoryOrders: ReorderCategoryPayload): Promi
   '/me/categories/reorder',
   categoryOrders,
 );
+
+export const followUser = (userId: string) => axios.post(`/me/follow/users/${userId}`);
+export const getUserFollow = (userId: string) => axios.get(`/me/follow/users/${userId}`);
+export const unfollowUser = (userId: string) => axios.delete(`/me/follow/users/${userId}`);

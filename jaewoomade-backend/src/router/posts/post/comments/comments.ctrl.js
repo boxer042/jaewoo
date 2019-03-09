@@ -4,6 +4,7 @@ import type { Context, Middleware } from 'koa';
 import db from 'database/db';
 import Comment, { type WriteParams } from 'database/models/Comment';
 import { validateSchema } from 'lib/common';
+import PostScore, { TYPES } from 'database/models/PostScore';
 
 export const writeComment: Middleware = async (ctx: Context) => {
   type BodySchema = {
@@ -72,6 +73,13 @@ export const writeComment: Middleware = async (ctx: Context) => {
     }
     const commentWithUsername = await Comment.readComment(comment.id);
     ctx.body = commentWithUsername;
+
+    await PostScore.create({
+      type: TYPES.COMMENT,
+      fk_user_id: userId,
+      fk_post_id: postId,
+      score: 0.375,
+    });
   } catch (e) {
     ctx.throw(e);
   }

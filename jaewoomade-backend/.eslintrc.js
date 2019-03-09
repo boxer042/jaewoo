@@ -29,6 +29,7 @@ module.exports = {
 		"no-useless-return": 0,
 		"camelcase": 0,
     "prefer-const": 0,
+		"no-mixed-operators": 0,
 	},
 	"plugins": [
 	  "flowtype"

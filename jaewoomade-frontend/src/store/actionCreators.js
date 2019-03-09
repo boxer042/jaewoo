@@ -9,6 +9,7 @@ import { actionCreators as writeActions, type WriteActionCreators } from './modu
 import { actionCreators as postsActions, type PostsActionCreators } from './modules/posts';
 import { actionCreators as listingActions, type ListingActionCreators } from './modules/listing';
 import { actionCreators as profileActions } from './modules/profile';
+import { actionCreators as followActions } from './modules/follow';
 
 const { dispatch } = store;
 
@@ -19,3 +20,4 @@ export const WriteActions: WriteActionCreators = bindActionCreators(writeActions
 export const PostsActions: PostsActionCreators = bindActionCreators(postsActions, dispatch);
 export const ListingActions: ListingActionCreators = bindActionCreators(listingActions, dispatch);
 export const ProfileActions: ProfileActionCreators = bindActionCreators(profileActions, dispatch);
+export const FollowActions = bindActionCreators(followActions, dispatch);

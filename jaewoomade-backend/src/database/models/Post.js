@@ -38,6 +38,10 @@ const Post = db.define('post', {
     type: Sequelize.JSONB,
     defaultValue: {},
   },
+  views: {
+      defaultValue: 0,
+      type: Sequelize.INTEGER,
+    },
 }, {
     indexes: [
       {

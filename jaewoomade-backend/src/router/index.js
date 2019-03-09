@@ -1,6 +1,8 @@
 // @flow
 import Router from 'koa-router';
 import type { Context } from 'koa';
+import crypto from 'crypto';
+import { PostReadcounts } from 'database/views';
 import needsAuth from 'lib/middlewares/needsAuth';
 import auth from './auth';
 import posts from './posts';
@@ -21,7 +23,13 @@ router.use('/users', users.routes());
 router.get('/check', (ctx: Context) => {
   ctx.body = {
     version: '1.0.1-alpha.0',
+    origin: ctx.origin,
   };
+});
+
+router.get('/test', async (ctx: Context) => {
+  const data = await PostReadcounts.findAll();
+  ctx.body = data;
 });
 
 export default router;

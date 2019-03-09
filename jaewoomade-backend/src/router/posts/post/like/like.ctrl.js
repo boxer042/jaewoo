@@ -1,6 +1,8 @@
 // @flow
 import type { Context } from 'koa';
-import { PostLike } from 'database/models';
+import { PostLike, PostScore } from 'database/models';
+import db from 'database/db';
+import { TYPES } from 'database/models/PostScore';
 
 export const getLike = async (ctx: Context): Promise<*> => {
   let liked = false;
@@ -51,8 +53,16 @@ export const likePost = async (ctx: Context): Promise<*> => {
       liked: true,
       likes: count,
     };
-    post.likes = count;
-    post.save();
+    setTimeout(async () => {
+      PostScore.create({
+        type: TYPES.LIKE,
+        fk_user_id: userId,
+        fk_post_id: id,
+        score: 5,
+      });
+      post.likes = count;
+      post.save();
+    }, 0);
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -85,8 +95,20 @@ export const unlikePost = async (ctx: Context): Promise<*> => {
       liked: false,
       likes: count,
     };
-    post.likes = count;
-    post.save();
+    setTimeout(async () => {
+      post.likes = count;
+      post.save();
+      const postScore = await PostScore.findOne({
+        where: {
+          type: TYPES.LIKE,
+          fk_user_id: userId,
+          fk_post_id: id,
+        },
+      });
+      if (postScore) {
+        await postScore.destroy();
+      }
+    }, 0);
   } catch (e) {
     ctx.throw(500, e);
   }
