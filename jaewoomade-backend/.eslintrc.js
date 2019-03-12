@@ -30,6 +30,7 @@ module.exports = {
 		"camelcase": 0,
     "prefer-const": 0,
 		"no-mixed-operators": 0,
+		'no-restricted-globals': 0,
 	},
 	"plugins": [
 	  "flowtype"

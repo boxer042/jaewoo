@@ -10,6 +10,7 @@ import { actionCreators as postsActions, type PostsActionCreators } from './modu
 import { actionCreators as listingActions, type ListingActionCreators } from './modules/listing';
 import { actionCreators as profileActions } from './modules/profile';
 import { actionCreators as followActions } from './modules/follow';
+import { actionCreators as commonActions } from './modules/common';
 
 const { dispatch } = store;
 
@@ -21,3 +22,4 @@ export const PostsActions: PostsActionCreators = bindActionCreators(postsActions
 export const ListingActions: ListingActionCreators = bindActionCreators(listingActions, dispatch);
 export const ProfileActions: ProfileActionCreators = bindActionCreators(profileActions, dispatch);
 export const FollowActions = bindActionCreators(followActions, dispatch);
+export const CommonActions: typeof commonActions = bindActionCreators(commonActions, dispatch);

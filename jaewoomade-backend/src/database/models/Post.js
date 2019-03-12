@@ -203,6 +203,48 @@ Post.chekUrlSlugExistancy = function ({
   });
 };
 
+Post.readPostsByIds = async (postIds) => {
+  const fullPosts = await Post.findAll({
+    include: [
+      {
+        model: User,
+        include: [UserProfile],
+      },
+      Tag,
+      Category,
+    ],
+    where: {
+      id: {
+        $or: postIds,
+      },
+    },
+    order: [['created_at', 'DESC']],
+  });
+
+  const flatData = {};
+  fullPosts.forEach((p) => {
+    flatData[p.id] = p;
+  });
+  return postIds.map(postId => flatData[postId]);
+};
+
+Post.listPublicPosts = function ({ tag, page, option }: PublicPostsQueryInfo) {
+  const limit = 20;
+  return Post.findAndCountAll({
+    distinct: 'id',
+    order: [['created_at', 'DESC']],
+    include: [
+      {
+        model: Tag,
+        attributes: ['name'],
+        where: tag ? { name: tag } : null,
+      },
+    ],
+    offset: ((!page ? 1 : page) - 1) * limit,
+    limit,
+  });
+};
+
 Post.prototype.like = async function like(transaction): Promise<*> {
   return this.increment('likes', { by: 1, transaction });
 };

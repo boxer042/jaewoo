@@ -12,6 +12,9 @@ const CLEAR_USER_POSTS = 'listing/CLEAR_USER_POSTS';
 const GET_USER_POSTS = 'listing/GET_USER_POSTS';
 const PREFETCH_USER_POSTS = 'listing/PREFETCH_USER_POSTS';
 
+const GET_TRENDING_POSTS = 'listing/GET_TRENDING_POSTS';
+const PREFETCH_TRENDING_POSTS = 'listing/PREFETCH_TRENDING_POSTS';
+
 export const actionCreators = {
   getRecentPosts: createAction(GET_RECENT_POSTS, PostsAPI.getPublicPosts),
   prefetchRecentPosts: createAction(PREFETCH_RECENT_POSTS, PostsAPI.getPublicPosts),
@@ -23,6 +26,8 @@ export const actionCreators = {
     meta => meta,
   ),
   prefetchUserPosts: createAction(PREFETCH_USER_POSTS, PostsAPI.getUserPosts),
+  getTrendingPosts: createAction(GET_TRENDING_POSTS, PostsAPI.getTrendingPosts),
+  prefetchTrendingPosts: createAction(PREFETCH_TRENDING_POSTS, PostsAPI.getTrendingPosts),
 };
 
 export type PostItem = {
@@ -82,9 +87,10 @@ const initialListingSet = {
 };
 
 const initialState: Listing = {
+  trendingMap: {},
+  trending: initialListingSet,
   recent: initialListingSet,
   user: { ...initialListingSet, currentUsername: null, currentTag: null },
-
 };
 
 const reducer = handleActions(
@@ -168,6 +174,37 @@ export default applyPenders(reducer, [
         draft.user.prefetched = data;
         if (data && data.length === 0) {
           draft.user.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: GET_TRENDING_POSTS,
+    onSuccess: (state, action) => {
+      return produce(state, (draft) => {
+        action.payload.data.forEach((post) => {
+          draft.trendingMap[post.id] = true;
+        });
+        draft.trending = {
+          end: false,
+          posts: action.payload.data,
+          prefetched: null,
+        };
+      });
+    },
+  },
+  {
+    type: PREFETCH_TRENDING_POSTS,
+    onSuccess: (state, action) => {
+      const { data } = action.payload;
+      return produce(state, (draft) => {
+        const filtered = data.filter(post => !state.trendingMap[post.id]);
+        draft.trending.prefetched = filtered;
+        filtered.forEach((post) => {
+          draft.trendingMap[post.id] = true;
+        });
+        if (data && data.length === 0) {
+          draft.trending.end = true;
         }
       });
     },

@@ -1,7 +1,7 @@
 // @flow
 import type { Context } from 'koa';
 import Joi from 'joi';
-import { validateSchema, filterUnique, generateSlugId, escapeForUrl, isUUID, generalHash } from 'lib/common';
+import { validateSchema, filterUnique, generateSlugId, escapeForUrl, isUUID, generalHash, formatShortDescription } from 'lib/common';
 import {
   Category,
   Post,
@@ -20,6 +20,7 @@ import {
 } from 'database/models';
 import shortid from 'shortid';
 import { serializePost, type PostModel } from 'database/models/Post';
+import { getTrendingPosts } from 'database/rawQuery/trending';
 import removeMd from 'remove-markdown';
 import Sequelize from 'sequelize';
 import { TYPES } from 'database/models/PostScore';
@@ -290,6 +291,34 @@ export const listPosts = async (ctx: Context): Promise<*> => {
     // const link = `<${ctx.path}?cursor=${result.data[result.data.length - 1].id}>`;
     // ctx.set('Link', link);
     ctx.set('Count', (result.count).toString());
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const listTrendingPosts = async (ctx) => {
+  const { option } = ctx.query;
+  if (isNaN(ctx.query.offset || 0)) {
+    ctx.body = {
+      type: 'INVALID_OFFSET',
+    };
+    ctx.status = 400;
+    return;
+  }
+  const offset = parseInt(ctx.query.offset || 0, 10);
+
+  // check cursor
+  try {
+    const postIds = await getTrendingPosts(offset || 0);
+    if (!postIds || postIds.length === 0) {
+      ctx.body = [];
+      return;
+    }
+    const posts = await Post.readPostsByIds(postIds.map(postId => postId.post_id));
+    const data = posts
+      .map(serializePost)
+      .map(post => ({ ...post, body: formatShortDescription(post.body) }));
+    ctx.body = data;
   } catch (e) {
     ctx.throw(500, e);
   }
