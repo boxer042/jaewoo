@@ -145,7 +145,8 @@ export const writePost = async (ctx: Context): Promise<*> => {
   const replaceDashToSpace = text => text.replace(/-/g, ' ');
 
   // 중복 값 하나만
-  const uniqueTags: Array<string> = filterUnique(tags).map(replaceDashToSpace);
+  const uniqueTags: Array<string> = filterUnique(tags);
+  // .map(replaceDashToSpace);
   const uniqueCategories: Array<string> = filterUnique(categories);
 
   try {

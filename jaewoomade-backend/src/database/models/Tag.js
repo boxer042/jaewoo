@@ -40,7 +40,8 @@ Tag.findByName = async (name: string) => {
 };
 
 // gets tag id if exists, create one if !exists.
-Tag.getId = async function getId(name: string) {
+Tag.getId = async function getId(rawName: string) {
+  const name = rawName.trim();
   try {
     // let tag = await Tag.findOne({ where: { name } });
     let tag = await Tag.findOne({
