@@ -75,10 +75,12 @@ class UserPosts extends Component {
 
   render() {
     const { prefetching, loading, posts } = this.props;
+
     if (!posts) {
       // TODO: Show placeholder
-      return <div>로딩중</div>;
+      return <UserPostCardList.Placeholder />;
     }
+
     return (
       <Fragment>
          <UserPostCardList posts={posts} username={this.props.username} />

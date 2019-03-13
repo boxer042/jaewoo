@@ -84,3 +84,8 @@ export const getUserPosts = ({ username, cursor, tag }: GetUserPostsPayload) => 
   });
   return axios.get(`/posts/@${username}?${query}`);
 };
+
+export const getPublicPostsByTag = (payload: GetPublicPostsByTagPayload) => {
+  const query = queryString.stringify(payload);
+  return axios.get(`/posts/public?${query}`);
+};

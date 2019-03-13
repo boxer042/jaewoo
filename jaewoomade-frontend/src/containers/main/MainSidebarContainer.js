@@ -10,8 +10,6 @@ type Props = {
 
 class MainSidebarContainer extends Component<Props> {
   render() {
-    const { match } = this.props;
-
     return <MainSidebar url={this.props.match.url} />;
   }
 }

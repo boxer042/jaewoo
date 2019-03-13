@@ -15,6 +15,10 @@ const PREFETCH_USER_POSTS = 'listing/PREFETCH_USER_POSTS';
 const GET_TRENDING_POSTS = 'listing/GET_TRENDING_POSTS';
 const PREFETCH_TRENDING_POSTS = 'listing/PREFETCH_TRENDING_POSTS';
 
+const GET_TAG_POSTS = 'listing/GET_TAG_POSTS';
+const PREFETCH_TAG_POSTS = 'listing/PREFETCH_TAG_POSTS';
+const CLEAR_TAG_POSTS = 'listing/CLEAR_TAG_POSTS';
+
 export const actionCreators = {
   getRecentPosts: createAction(GET_RECENT_POSTS, PostsAPI.getPublicPosts),
   prefetchRecentPosts: createAction(PREFETCH_RECENT_POSTS, PostsAPI.getPublicPosts),
@@ -28,6 +32,13 @@ export const actionCreators = {
   prefetchUserPosts: createAction(PREFETCH_USER_POSTS, PostsAPI.getUserPosts),
   getTrendingPosts: createAction(GET_TRENDING_POSTS, PostsAPI.getTrendingPosts),
   prefetchTrendingPosts: createAction(PREFETCH_TRENDING_POSTS, PostsAPI.getTrendingPosts),
+  getTagPosts: createAction(
+    GET_TAG_POSTS,
+    PostsAPI.getPublicPostsByTag,
+    (meta: { tag: string }) => meta,
+  ),
+  prefetchTagPosts: createAction(PREFETCH_TAG_POSTS, PostsAPI.getPublicPostsByTag),
+  clearTagPosts: createAction(CLEAR_TAG_POSTS),
 };
 
 export type PostItem = {
@@ -91,6 +102,7 @@ const initialState: Listing = {
   trending: initialListingSet,
   recent: initialListingSet,
   user: { ...initialListingSet, currentUsername: null, currentTag: null },
+  tag: { ...initialListingSet, currentTag: null },
 };
 
 const reducer = handleActions(
@@ -112,6 +124,16 @@ const reducer = handleActions(
           prefetched: null,
           end: false,
           currentUsername: null,
+          currentTag: null,
+        };
+      });
+    },
+    [CLEAR_TAG_POSTS]: (state) => {
+      return produce(state, (draft) => {
+        draft.tag = {
+          posts: null,
+          prefetched: null,
+          end: false,
           currentTag: null,
         };
       });
@@ -205,6 +227,31 @@ export default applyPenders(reducer, [
         });
         if (data && data.length === 0) {
           draft.trending.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: GET_TAG_POSTS,
+    onSuccess: (state: Listing, action: PostsResponseAction) => {
+      return produce(state, (draft) => {
+        draft.tag = {
+          end: action.payload.data.length < 20,
+          posts: action.payload.data,
+          prefetched: null,
+          currentTag: action.meta.tag,
+        };
+      });
+    },
+  },
+  {
+    type: PREFETCH_TAG_POSTS,
+    onSuccess: (state: Listing, action: PostsResponseAction) => {
+      const { data } = action.payload;
+      return produce(state, (draft) => {
+        draft.tag.prefetched = data;
+        if (data && data.length === 0) {
+          draft.tag.end = true;
         }
       });
     },
