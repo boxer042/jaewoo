@@ -1,12 +1,14 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import type { State } from 'store';
 import { WriteActions } from 'store/actionCreators';
 import WriteHeader from 'components/write/WriteHeader';
+import Blocker from 'components/common/Blocker';
 import type { PostData } from 'store/modules/write';
+import queryString from 'query-string';
 import { compose } from 'redux';
-import { withRouter } from 'react-router-dom';
+import { Prompt, withRouter } from 'react-router-dom';
 
 type Props = {
   title: string,
@@ -18,6 +20,29 @@ type Props = {
 };
 
 class WriteHeaderContainer extends Component<Props> {
+  timer = null;
+
+  componentDidMount() {
+    this.timer = setInterval(this.autoTempSave, 30000);
+    // reads edit_id
+    const query = queryString.parse(this.props.location.search);
+    if (query.edit_id) {
+      this.loadPost(query.edit_id);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  autoTempSave = () => {
+    const { postData, changed } = this.props;
+    if (!postData || !changed) return;
+    this.onTempSave();
+  };
+
   onChangeTitle = (e) => {
     const { value } = e.target;
     WriteActions.editField({
@@ -86,20 +111,29 @@ class WriteHeaderContainer extends Component<Props> {
   };
 
   render() {
-    const { onChangeTitle, onOpenSubmitBox, onTempSave, onShowWriteExtra, onHideWriteExtra } = this;
+    const { onChangeTitle,
+      onOpenSubmitBox, onTempSave,
+      onShowWriteExtra, onHideWriteExtra, changed } = this;
     const { title, postData, writeExtraOpen } = this.props;
     return (
-      <WriteHeader
-        onOpenSubmitBox={onOpenSubmitBox}
-        onChangeTitle={onChangeTitle}
-        onShowWriteExtra={onShowWriteExtra}
-        onHideWriteExtra={onHideWriteExtra}
-        title={title}
-        onTempSave={onTempSave}
-        isEdit={!!postData && !postData.is_temp}
-        writeExtraOpen={writeExtraOpen}
-        onGoBack={this.onGoBack}
-      />
+      <Fragment>
+        <WriteHeader
+          onOpenSubmitBox={onOpenSubmitBox}
+          onChangeTitle={onChangeTitle}
+          onShowWriteExtra={onShowWriteExtra}
+          onHideWriteExtra={onHideWriteExtra}
+          title={title}
+          onTempSave={onTempSave}
+          isEdit={!!postData && !postData.is_temp}
+          writeExtraOpen={writeExtraOpen}
+          onGoBack={this.onGoBack}
+        />
+        <Prompt
+          when={!!title && changed}
+          message={() => '작성중이던 포스트가 있습니다. 정말로 나가시겠습니까?'}
+        />
+        {changed && <Blocker />}
+      </Fragment>
     );
   }
 }
@@ -114,6 +148,8 @@ export default compose(
       categories: write.submitBox.categories,
       tags: write.submitBox.tags,
       writeExtraOpen: write.writeExtra.visible,
+      thumbnail: write.thumbnail,
+      changed: write.changed,
     }),
     () => ({}),
   ),

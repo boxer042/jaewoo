@@ -11,6 +11,20 @@ class WriteExtraContainer extends Component<Props> {
     WriteActions.listTempSaves(postData.id);
   }
 
+  tempSave = async () => {
+    const { postData, title, body, changed } = this.props;
+
+    if (!changed) return;
+
+    try {
+      if (postData) {
+        await WriteActions.tempSave({ title, body, postId: postData.id });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   componentDidUpdate(prevProps) {
     if (!prevProps.visible && this.props.visible) {
       // WriteExtra is now visible
@@ -33,6 +47,7 @@ class WriteExtraContainer extends Component<Props> {
   onLoadTempSave = async (id) => {
     const { postData } = this.props;
     if (!postData) return;
+    await this.tempSave();
     await WriteActions.loadTempSave({
       postId: postData.id,
       saveId: id,

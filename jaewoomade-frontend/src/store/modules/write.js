@@ -287,6 +287,7 @@ const reducer = handleActions({
     const { field, value } = payload;
     return produce(state, (draft) => {
       draft[field] = value;
+      draft.changed = true;
     });
   },
   [SET_THUMBNAIL]: (state, { payload }: SetThumbnailAction) => {
@@ -504,6 +505,7 @@ export default applyPenders(reducer, [
     type: WRITE_POST,
     onSuccess: (state: Write, { payload: { data } }) => {
       return produce(state, (draft) => {
+        draft.changed = false;
         draft.postData = data;
       });
     },
@@ -524,8 +526,18 @@ export default applyPenders(reducer, [
     type: UPDATE_POST,
     onSuccess: (state: Write, { payload: { data } }) => {
       return produce(state, (draft) => {
+        draft.changed = false;
         draft.postData = data;
       });
+    },
+  },
+  {
+    type: TEMP_SAVE,
+    onSuccess: (state: Write) => {
+      return {
+        ...state,
+        changed: false,
+      };
     },
   },
   {
