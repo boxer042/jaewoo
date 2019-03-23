@@ -3,7 +3,9 @@ import { createAction, handleActions, type ActionType } from 'redux-actions';
 import produce from 'immer';
 import * as MeAPI from 'lib/api/me';
 import * as PostsAPI from 'lib/api/posts';
+import * as SavesAPI from 'lib/api/posts/saves';
 import format from 'date-fns/format';
+
 import { applyPenders } from 'lib/common';
 
 /* ACTION TYPE */
@@ -44,6 +46,9 @@ const SET_LAYOUT_MODE = 'write/SET_LAYOUT_MODE';
 const TOGGLE_ADDTIONAL_CONFIG = 'write/TOGGLE_ADDTIONAL_CONFIG';
 const SET_META_VALUE = 'write/SET_META_VALUE';
 const RESET_META = 'write/RESET_META';
+
+const LIST_TEMP_SAVES = 'write/LIST_TEMP_SAVES';
+const LOAD_TEMP_SAVE = 'write/LOAD_TEMP_SAVE';
 
 let tempCategoryId = 0;
 
@@ -134,6 +139,8 @@ export const actionCreators = {
   toggleAdditionalConfig: createAction(TOGGLE_ADDTIONAL_CONFIG),
   setMetaValue: createAction(SET_META_VALUE, payload => payload),
   resetMeta: createAction(RESET_META),
+  listTempSaves: createAction(LIST_TEMP_SAVES, SavesAPI.getTempSaveList),
+  loadTempSave: createAction(LOAD_TEMP_SAVE, SavesAPI.loadTempSave),
 };
 
 /* STATE TYPES */
@@ -271,6 +278,7 @@ const initialState: Write = {
   },
   insertText: null,
   tempSaves: null,
+  changed: false,
 };
 
 /* REDUCER */
@@ -425,7 +433,7 @@ const reducer = handleActions({
       draft.upload.progress = action.payload;
     });
   },
-  [SHOW_WRITE_EXTRA]: (state, action) => {
+  [SHOW_WRITE_EXTRA]: (state) => {
     return produce(state, (draft) => {
       draft.writeExtra.visible = true;
     });
@@ -527,6 +535,25 @@ export default applyPenders(reducer, [
         draft.upload.uploadUrl = data.url;
         draft.upload.imagePath = data.imagePath;
         draft.upload.id = data.id;
+      });
+    },
+  },
+  {
+    type: LIST_TEMP_SAVES,
+    onSuccess: (state, { payload }) => {
+      return {
+        ...state,
+        tempSaves: payload.data,
+      };
+    },
+  },
+  {
+    type: LOAD_TEMP_SAVE,
+    onSuccess: (state, { payload }) => {
+      return produce(state, (draft) => {
+        draft.changed = false;
+        draft.body = payload.data.body;
+        draft.title = payload.data.title;
       });
     },
   },

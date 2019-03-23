@@ -5,15 +5,6 @@ import RemoveIcon from 'react-icons/lib/io/trash-b';
 import EditIcon from 'react-icons/lib/md/edit';
 import './CategoryEditItem.scss';
 
-type Props = {
-  edit?: boolean,
-  name: string,
-  temp?: boolean,
-  onToggleEditCategory(): void,
-  onChange(e: SyntheticInputEvent<HTMLInputElement>): any,
-  onHide(): void,
-}
-
 const defaultProps = {
   edit: false,
   temp: false,

@@ -1,7 +1,7 @@
 // @flow
 import type { Context, Middleware } from 'koa';
 import Joi from 'joi';
-import { validateSchema, extractKeys } from 'lib/common';
+import { validateSchema, extractKeys, isUUID } from 'lib/common';
 import PostHistory from 'database/models/PostHistory';
 
 export const tempSave = async (ctx: Context): Promise<*> => {
@@ -36,6 +36,29 @@ export const tempSave = async (ctx: Context): Promise<*> => {
     ctx.body = extractKeys(postHistory, [
       'id', 'title', 'body', 'created_at', 'is_release',
     ]);
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+export const loadTempSave = async (ctx) => {
+  const { id, saveId } = ctx.params;
+  if (!isUUID(saveId)) {
+    ctx.body = {
+      name: 'NOT_UUID',
+    };
+    ctx.status = 400;
+    return;
+  }
+  try {
+    const postHistory = await PostHistory.findOne({
+      attributes: ['id', 'title', 'body', 'created_at'],
+      where: {
+        fk_post_id: id,
+        id: saveId,
+      },
+    });
+    ctx.body = postHistory;
   } catch (e) {
     ctx.throw(500, e);
   }

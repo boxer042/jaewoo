@@ -58,6 +58,7 @@ class WriteExtra extends Component<Props, State> {
         </section>
         <section className="full">
           <h4>임시 저장 기록</h4>
+          {tempSaveList}
         </section>
       </div>
     );

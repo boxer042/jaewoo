@@ -5,7 +5,7 @@ import { escapeForUrl } from 'lib/common';
 
 import './UserTagView.scss';
 
-const UserTagView = ({ username, tagCounts }: Props) => (
+const UserTagView = ({ username, tagCounts, onSelectTag }: Props) => (
   <div className="UserTagView">
     <section>
       <div className="section-title">태그</div>
@@ -20,7 +20,8 @@ const UserTagView = ({ username, tagCounts }: Props) => (
               <li key={t.tag}>
                 <NavLink
                   activeClassName="active"
-                  to="/"
+                  to={`/@${username}/tags/${escapeForUrl(t.tag)}`}
+                  onClick={() => onSelectTag(t.tag)}
                 >
                   {t.tag}
                   <span className="count">{t.count}</span>

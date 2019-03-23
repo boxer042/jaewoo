@@ -9,20 +9,6 @@ import axios from 'lib/defaultClient';
 import type { PostData, Category } from 'store/modules/write';
 import { escapeForUrl } from 'lib/common';
 
-type Props = {
-  body: string,
-  mask: boolean,
-  postData: ?PostData,
-  tags: string[],
-  categories: ?(Category[]),
-  insertText: ?string,
-  uploadUrl: ?string,
-  imagePath: ?string,
-  uploadId: ?string,
-  thumbnail: ?string,
-  categoryModalOpen: boolean,
-}
-
 class CodeEditorContainer extends Component<Props> {
   onEditBody = (value) => {
     WriteActions.editField({

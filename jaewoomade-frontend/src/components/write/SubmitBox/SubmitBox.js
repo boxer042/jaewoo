@@ -3,6 +3,7 @@ import React, { Component, Fragment } from 'react';
 import onClickOutside from 'react-onclickoutside';
 import SettingsIcon from 'react-icons/lib/md/settings';
 import cx from 'classnames';
+import { Link } from 'react-router-dom';
 
 import './SubmitBox.scss';
 
@@ -68,6 +69,7 @@ class SubmitBox extends Component<Props, State> {
       isEdit, selectCategory, inputTags, visible,
       onSubmit, onEditCategoryClick, onClose,
       configureThumbnail, onToggleAdditionalConfig, additional,
+      postLink,
     } = this.props;
     const { animating } = this.state;
     if (!visible && !animating) return null;
@@ -76,7 +78,12 @@ class SubmitBox extends Component<Props, State> {
       <div className={cx('SubmitBox', visible ? 'appear' : 'disappear')}>
         <div className="title">
           <div className="text">{isEdit ? '수정하기' : '새 글 작성하기'}</div>
-          {isEdit && <div className="view">글 보기</div>}
+          {isEdit &&
+            postLink && (
+              <Link className="view" to={postLink}>
+                글 보기
+              </Link>
+            )}
         </div>
         {additional || (
           <Fragment>

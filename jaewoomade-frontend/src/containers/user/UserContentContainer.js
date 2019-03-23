@@ -12,6 +12,7 @@ class UserContentContainer extends Component {
   initialize = async () => {
     const { username } = this.props.match.params;
     if (!username) return;
+    ProfileActions.initialize();
     await ProfileActions.getUserTags(username);
     await ProfileActions.getProfile(username);
   }
@@ -19,6 +20,10 @@ class UserContentContainer extends Component {
   componentDidMount() {
     this.initialize();
   }
+
+  onSelectTag = (tagName: string) => {
+    ProfileActions.setRawTagName(tagName);
+  };
 
   componentDidUpdate(prevProps) {
     if (this.props.match.params.username !== prevProps.match.params.username) {
@@ -38,10 +43,12 @@ class UserContentContainer extends Component {
           <UserTagView
             tagCounts={tagCounts}
             username={username}
+            onSelectTag={this.onSelectTag}
           />
         }
       >
         <Route exact path="/@:username" component={UserPostsSubpage} />
+        <Route path="/@:username/tags/:tag" component={UserPostsSubpage} />
       </UserContent>
     );
   }

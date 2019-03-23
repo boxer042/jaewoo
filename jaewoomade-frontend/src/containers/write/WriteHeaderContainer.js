@@ -35,35 +35,41 @@ class WriteHeaderContainer extends Component<Props> {
   }
 
   onTempSave = async () => {
-    const { postData, title, body, tags, categories } = this.props;
+    const { postData, title, body, tags, categories, thumbnail } = this.props;
 
     const activeCategories = (() => {
       if (!categories || categories.length === 0) return [];
       return categories.filter(c => c.active).map(c => c.id);
     })();
 
-    if (!postData) {
-      WriteActions.writePost({
-        title,
-        body,
-        tags,
-        isMarkdown: true,
-        isTemp: true,
-        categories: activeCategories,
-      });
-    }
-    if (postData && postData.is_temp) {
-      WriteActions.updatePost({
-        id: postData.id,
-        title,
-        body,
-        tags,
-        is_temp: postData.is_temp,
-        categories: activeCategories,
-      });
-    }
-    if (this.props.postData) {
-      await WriteActions.tempSave({ title, body, postId: this.props.postData.id });
+    try {
+      if (!postData) {
+        await WriteActions.writePost({
+          title,
+          body,
+          tags,
+          isMarkdown: true,
+          isTemp: true,
+          thumbnail,
+          categories: activeCategories,
+        });
+      }
+      if (postData && postData.is_temp) {
+        await WriteActions.updatePost({
+          id: postData.id,
+          title,
+          body,
+          tags,
+          is_temp: postData.is_temp,
+          thumbnail,
+          categories: activeCategories,
+        });
+      }
+      if (this.props.postData) {
+        await WriteActions.tempSave({ title, body, postId: this.props.postData.id });
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 

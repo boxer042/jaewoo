@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
-import { ListingActions } from 'store/actionCreators';
+import { ListingActions, ProfileActions } from 'store/actionCreators';
 import UserPostCardList from 'components/user/UserPostCardList';
 import { getScrollBottom, preventStickBottom } from 'lib/common';
 import throttle from 'lodash/throttle';
@@ -16,10 +16,21 @@ class UserPosts extends Component {
 
   initialize = async () => {
     const { username, tag } = this.props;
+    ListingActions.clearUserPosts();
+    this.setState({ loading: true });
+    if (tag) {
+      try {
+        await ProfileActions.getTagInfo(tag);
+      } catch (e) {
+        this.setState({ loading: false });
+        console.log(e);
+      }
+    }
+    const { rawTagName } = this.props;
     try {
       await ListingActions.getUserPosts({
         username,
-        tag,
+        tag: tag ? rawTagName || undefined : undefined,
       });
       this.setState({ loading: false });
     } catch (e) {
@@ -35,6 +46,12 @@ class UserPosts extends Component {
   }
   componentWillUnmount() {
     this.unlistenScroll();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.tag !== this.props.tag || prevProps.profile !== this.props.profile) {
+      this.initialize();
+    }
   }
 
   prefetch = async () => {
@@ -90,12 +107,13 @@ class UserPosts extends Component {
 }
 
 export default connect(
-  ({ listing, pender }) => ({
+  ({ listing, pender, profile }) => ({
     posts: listing.user.posts,
     prefetched: listing.user.prefetched,
     hadEnded: listing.user.end,
     prefetching: pender.pending['listing/PREFETCH_USER_POSTS'],
-    loading: pender.pending['listing/GET_USER_POSTS'],
+    loading: pender.pending['listing/GET_USER_POSTS'] || pender.pending['profile/GET_TAG_INFO'],
+    rawTagName: profile.rawTagName,
     currentUsername: listing.user.currentUsername,
     currentTag: listing.user.currentTag,
   }),
