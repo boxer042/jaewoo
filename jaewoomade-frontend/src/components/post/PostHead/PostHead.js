@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { fromNow } from 'lib/common';
 import PostLikeButton from 'components/post/PostLikeButton';
 import './PostHead.scss';
+import PostActionButtons from '../PostActionButtons';
 
 type Props = {
   title: string,
@@ -20,13 +21,15 @@ type Props = {
 const PostHead = ({
   id,
   title,
-  tags,
-  user,
   date,
+  categories,
+  user,
   likes,
   liked,
-  logged,
+  ownPost,
   onToggleLike,
+  onAskRemove,
+  logged,
 }: Props) => {
   const userLink = `/@${user.username}`;
   return (
@@ -49,6 +52,7 @@ const PostHead = ({
         <PostLikeButton onClick={onToggleLike} liked={liked} likes={likes} disabled={!logged} />
       </div>
       <div className="separator" />
+      {ownPost && <PostActionButtons id={id} onAskRemove={onAskRemove} />}
     </div>
   );
 };

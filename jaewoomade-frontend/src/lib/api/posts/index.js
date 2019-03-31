@@ -89,3 +89,19 @@ export const getPublicPostsByTag = (payload: GetPublicPostsByTagPayload) => {
   const query = queryString.stringify(payload);
   return axios.get(`/posts/public?${query}`);
 };
+
+export const getTempPosts = ({ username, cursor }: GetTempPostsPayload) => {
+  const query = queryString.stringify({
+    is_temp: true,
+    cursor,
+  });
+  return axios.get(`/posts/@${username}?${query}`);
+};
+
+export const deletePost = (postId) => {
+  return axios.delete(`/posts/${postId}`);
+};
+
+export const getPostById = (postId: string) => {
+  return axios.get(`/posts/${postId}`);
+};

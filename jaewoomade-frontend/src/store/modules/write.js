@@ -50,6 +50,8 @@ const RESET_META = 'write/RESET_META';
 const LIST_TEMP_SAVES = 'write/LIST_TEMP_SAVES';
 const LOAD_TEMP_SAVE = 'write/LOAD_TEMP_SAVE';
 
+const GET_POST_BY_ID = 'write/GET_POST_BY_ID';
+
 let tempCategoryId = 0;
 
 /* ACTION CREATOR */
@@ -95,6 +97,7 @@ export interface WriteActionCreators {
   toggleAdditionalConfig(): any;
   setMetaValue(): any;
   resetMeta(): any;
+  getPostById(postId: string): any;
 }
 
 /* EXPORT ACTION CREATORS */
@@ -141,6 +144,7 @@ export const actionCreators = {
   resetMeta: createAction(RESET_META),
   listTempSaves: createAction(LIST_TEMP_SAVES, SavesAPI.getTempSaveList),
   loadTempSave: createAction(LOAD_TEMP_SAVE, SavesAPI.loadTempSave),
+  getPostById: createAction(GET_POST_BY_ID, PostsAPI.getPostById),
 };
 
 /* STATE TYPES */
@@ -566,6 +570,21 @@ export default applyPenders(reducer, [
         draft.changed = false;
         draft.body = payload.data.body;
         draft.title = payload.data.title;
+      });
+    },
+  },
+  {
+    type: GET_POST_BY_ID,
+    onSuccess: (state: Write, { payload }) => {
+      return produce(state, (draft) => {
+        draft.changed = false;
+        draft.postData = payload.data;
+        draft.submitBox.tags = payload.data.tags;
+        draft.submitBox.url_slug = payload.data.url_slug;
+        draft.body = payload.data.body;
+        draft.title = payload.data.title;
+        draft.thumbnail = payload.data.thumbnail;
+        draft.meta = payload.data.meta;
       });
     },
   },

@@ -23,6 +23,7 @@ import { serializePost, type PostModel } from 'database/models/Post';
 import { getTrendingPosts } from 'database/rawQuery/trending';
 import removeMd from 'remove-markdown';
 import Sequelize from 'sequelize';
+import { getCommentCountsOfPosts } from 'database/rawQuery/comments';
 import { TYPES } from 'database/models/PostScore';
 
 const { Op } = Sequelize;
@@ -262,13 +263,30 @@ export const readPost = async (ctx: Context): Promise<*> => {
     ctx.throw(500, e);
   }
 };
+function injectCommentCounts(posts, commentCounts) {
+  // inject postCount
+  return posts.map((p) => {
+    const row = commentCounts.find(cc => cc.fk_post_id === p.id);
+    const count = row ? row.comments_count : 0;
+    return {
+      ...p,
+      comments_count: count,
+    };
+  });
+}
 
 export const listPosts = async (ctx: Context): Promise<*> => {
   const { username } = ctx.params;
-  const { category, tag, cursor } = ctx.query;
+  const {
+    category, tag, cursor, is_temp,
+  } = ctx.query;
 
   const query = {
-    username, categoryUrlSlug: category, tag, cursor,
+    username,
+    categoryUrlSlug: category,
+    tag,
+    cursor,
+    isTemp: is_temp === 'true',
   };
 
   if (cursor && !isUUID(cursor)) {
@@ -279,6 +297,17 @@ export const listPosts = async (ctx: Context): Promise<*> => {
     return;
   }
 
+  if (is_temp === 'true') {
+    if (!ctx.user) {
+      ctx.status = 401;
+      return;
+    }
+    if (ctx.user.username !== username) {
+      ctx.status = 403;
+      return;
+    }
+  }
+
   try {
     const result = await Post.listPosts(query);
     if (!result.data) {
@@ -287,11 +316,15 @@ export const listPosts = async (ctx: Context): Promise<*> => {
     }
     // Fake Delay
     // await new Promise((resolve) => { setTimeout(resolve, 2000); });
-    ctx.body = result.data.map(serializePost)
-      .map(post => ({ ...post, body: removeMd(post.body).slice(0, 250) }));
-    // const link = `<${ctx.path}?cursor=${result.data[result.data.length - 1].id}>`;
-    // ctx.set('Link', link);
-    ctx.set('Count', (result.count).toString());
+    const data = result.data
+      .map(serializePost)
+      .map(post => ({ ...post, body: formatShortDescription(post.body) }));
+
+    const commentCounts = await getCommentCountsOfPosts(result.data.map(p => p.id));
+
+    ctx.body = injectCommentCounts(data, commentCounts);
+
+    ctx.set('Count', result.count.toString());
   } catch (e) {
     ctx.throw(500, e);
   }
@@ -319,7 +352,8 @@ export const listTrendingPosts = async (ctx) => {
     const data = posts
       .map(serializePost)
       .map(post => ({ ...post, body: formatShortDescription(post.body) }));
-    ctx.body = data;
+    const commentCounts = await getCommentCountsOfPosts(posts.map(p => p.id));
+    ctx.body = injectCommentCounts(data, commentCounts);
   } catch (e) {
     ctx.throw(500, e);
   }

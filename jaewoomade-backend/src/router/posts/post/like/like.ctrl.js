@@ -24,6 +24,7 @@ export const likePost = async (ctx: Context): Promise<*> => {
   const { id } = ctx.params;
   const { id: userId } = ctx.user;
   const { post } = ctx;
+
   try {
     const exists = await PostLike.checkExists({
       userId,

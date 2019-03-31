@@ -22,6 +22,10 @@ type Props = {
 class WriteHeaderContainer extends Component<Props> {
   timer = null;
 
+  loadPost = (id: string) => {
+    WriteActions.getPostById(id);
+  };
+
   componentDidMount() {
     this.timer = setInterval(this.autoTempSave, 30000);
     // reads edit_id

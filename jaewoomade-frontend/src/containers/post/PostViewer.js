@@ -54,7 +54,7 @@ class PostViewer extends Component<Props> {
   };
 
   render() {
-    const { post, toc, activeHeading, logged } = this.props;
+    const { post, toc, activeHeading, username, currentUsername, logged } = this.props;
     const { onSetToc, onActivateHeading } = this;
 
     if (!post) return null;
@@ -76,6 +76,7 @@ class PostViewer extends Component<Props> {
           likes={post.likes}
           liked={post.liked}
           onToggleLike={this.onToggleLike}
+          ownPost={currentUsername === username}
           logged={logged}
         />
         <PostContent
@@ -92,6 +93,7 @@ class PostViewer extends Component<Props> {
 
 export default connect(
   ({ posts, pender, user }: State) => ({
+    currentUsername: user.user && user.user.username,
     post: posts.post,
     toc: posts.toc,
     activeHeading: posts.activeHeading,

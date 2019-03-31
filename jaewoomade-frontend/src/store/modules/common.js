@@ -7,11 +7,17 @@ import * as PostsAPI from 'lib/api/posts';
 const GET_TAGS = 'common/GET_TAGS';
 const SET_TAG_INFO = 'common/SET_TAG_INFO';
 const GET_TAG_INFO = 'common/GET_TAG_INFO';
+const ASK_REMOVE = 'common/saves/ASK_REMOVE';
+const CLOSE_REMOVE = 'common/saves/CLOSE_REMOVE';
+const REMOVE_POST = 'common/saves/REMOVE_POST';
 
 export const actionCreators = {
   getTags: createAction(GET_TAGS, CommonAPI.getTags, meta => meta),
   setTagInfo: createAction(SET_TAG_INFO, info => info),
   getTagInfo: createAction(GET_TAG_INFO, CommonAPI.getTagInfo),
+  askRemove: createAction(ASK_REMOVE, (postId: string) => postId),
+  closeRemove: createAction(CLOSE_REMOVE),
+  removePost: createAction(REMOVE_POST, PostsAPI.deletePost),
 };
 
 const initialState = {
@@ -21,6 +27,10 @@ const initialState = {
     lastParam: null,
     sort: 'popular',
   },
+  saves: {
+    removeId: null,
+    ask: false,
+  },
 };
 
 const reducer = handleActions(
@@ -28,6 +38,17 @@ const reducer = handleActions(
     [SET_TAG_INFO]: (state, { payload }: SetTagInfoAction) => {
       return produce(state, (draft) => {
         draft.tags.selected = payload;
+      });
+    },
+    [ASK_REMOVE]: (state, { payload }: AskRemoveAction) => {
+      return produce(state, (draft) => {
+        draft.saves.ask = true;
+        draft.saves.removeId = payload;
+      });
+    },
+    [CLOSE_REMOVE]: (state) => {
+      return produce(state, (draft) => {
+        draft.saves.ask = false;
       });
     },
   }, initialState,

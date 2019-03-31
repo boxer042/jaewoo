@@ -19,6 +19,10 @@ const GET_TAG_POSTS = 'listing/GET_TAG_POSTS';
 const PREFETCH_TAG_POSTS = 'listing/PREFETCH_TAG_POSTS';
 const CLEAR_TAG_POSTS = 'listing/CLEAR_TAG_POSTS';
 
+const GET_TEMP_POSTS = 'listing/GET_TEMP_POSTS';
+const PREFETCH_TEMP_POSTS = 'listing/PREFETCH_TEMP_POSTS';
+const REMOVE_TEMP_POST = 'listing/REMOVE_TEMP_POST';
+
 export const actionCreators = {
   getRecentPosts: createAction(GET_RECENT_POSTS, PostsAPI.getPublicPosts),
   prefetchRecentPosts: createAction(PREFETCH_RECENT_POSTS, PostsAPI.getPublicPosts),
@@ -39,6 +43,9 @@ export const actionCreators = {
   ),
   prefetchTagPosts: createAction(PREFETCH_TAG_POSTS, PostsAPI.getPublicPostsByTag),
   clearTagPosts: createAction(CLEAR_TAG_POSTS),
+  getTempPosts: createAction(GET_TEMP_POSTS, PostsAPI.getTempPosts),
+  prefetchTempPosts: createAction(PREFETCH_TEMP_POSTS, PostsAPI.getTempPosts),
+  removeTempPost: createAction(REMOVE_TEMP_POST, (postId: string) => postId),
 };
 
 export type PostItem = {
@@ -103,6 +110,7 @@ const initialState: Listing = {
   recent: initialListingSet,
   user: { ...initialListingSet, currentUsername: null, currentTag: null },
   tag: { ...initialListingSet, currentTag: null },
+  temp: initialListingSet,
 };
 
 const reducer = handleActions(
@@ -136,6 +144,12 @@ const reducer = handleActions(
           end: false,
           currentTag: null,
         };
+      });
+    },
+    [REMOVE_TEMP_POST]: (state, { payload }: RemoveTempPostAction) => {
+      return produce(state, (draft) => {
+        if (!draft.temp.posts) return;
+        draft.temp.posts = draft.temp.posts.filter(p => p.id !== payload);
       });
     },
   },
@@ -252,6 +266,35 @@ export default applyPenders(reducer, [
         draft.tag.prefetched = data;
         if (data && data.length === 0) {
           draft.tag.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: GET_TEMP_POSTS,
+    onPending: (state: Listing) => {
+      return produce(state, (draft) => {
+        draft.temp.end = false;
+        draft.temp.prefetched = null;
+      });
+    },
+    onSuccess: (state: Listing, action: PostsResponseAction) => {
+      return produce(state, (draft) => {
+        draft.temp.posts = action.payload.data;
+        if (action.payload.data.length < 20) {
+          draft.temp.end = true;
+        }
+      });
+    },
+  },
+  {
+    type: PREFETCH_TEMP_POSTS,
+    onSuccess: (state: Listing, action: PostsResponseAction) => {
+      const { data } = action.payload;
+      return produce(state, (draft) => {
+        draft.temp.prefetched = data;
+        if (data && data.length === 0) {
+          draft.temp.end = true;
         }
       });
     },

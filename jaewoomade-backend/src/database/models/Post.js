@@ -109,6 +109,7 @@ Post.listPosts = async function ({
   categoryUrlSlug,
   tag,
   cursor,
+  isTemp,
 }: PostsQueryInfo) {
   // fin post with cursor
   let cursorData = null;
@@ -131,6 +132,7 @@ Post.listPosts = async function ({
     ${categoryUrlSlug ? `JOIN posts_categories pc ON p.id = pc.fk_post_id
     JOIN categories c ON c.id = pc.fk_category_id` : ''}
     WHERE true
+    ${isTemp ? 'AND p.is_temp = true' : 'AND p.is_temp = false'}
     ${username ? 'AND u.username = $username' : ''}
     ${tag ? 'AND t.name = $tag' : ''}
     ${categoryUrlSlug ? 'AND c.url_slug = $category' : ''}
@@ -158,7 +160,7 @@ Post.listPosts = async function ({
       `SELECT DISTINCT p.id, p.created_at FROM posts p
       ${query}
       ORDER BY created_at DESC
-      LIMIT 10
+      LIMIT 20
     `,
     { bind: bindVariables, type: Sequelize.QueryTypes.SELECT },
     );
