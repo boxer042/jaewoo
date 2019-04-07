@@ -29,6 +29,11 @@ const storage: Storage = {
   remove(key) {
     delete st[key];
   },
+  clear() {
+    if (st.clear) {
+      st.clear();
+    }
+  },
 };
 
 export default storage;

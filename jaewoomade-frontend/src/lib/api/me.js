@@ -29,3 +29,18 @@ export const reorderCategories = (categoryOrders: ReorderCategoryPayload): Promi
 export const followUser = (userId: string) => axios.post(`/me/follow/users/${userId}`);
 export const getUserFollow = (userId: string) => axios.get(`/me/follow/users/${userId}`);
 export const unfollowUser = (userId: string) => axios.delete(`/me/follow/users/${userId}`);
+
+export const updateProfile = ({ displayName, shortBio, thumbnail }) => axios.patch('/me/profile', {
+  display_name: displayName,
+  short_bio: shortBio,
+  thumbnail,
+});
+
+export const createThumbnailSignedUrl = (filename) =>
+  axios.post('/files/create-url/thumbnail', { filename });
+
+export const generateUnregisterToken = () => axios.get('/me/unregister-token');
+export const unregister = (unregisterToken: string) =>
+  axios.post('/me/unregister', {
+    unregister_token: unregisterToken,
+  });

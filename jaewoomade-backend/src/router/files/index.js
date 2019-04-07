@@ -12,7 +12,11 @@ files.post(
   needsAuth,
   filesCtrl.createPostImageSignedUrl,
 );
-
+files.post(
+  '/create-url/thumbnail',
+  needsAuth,
+  filesCtrl.createThumbnailSignedUrl,
+);
 files.post('/upload', needsAuth, filesCtrl.upload);
 files.post('/retrieve-size/:id', checkUUID, filesCtrl.retrieveSize);
 

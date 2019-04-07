@@ -335,12 +335,48 @@ export const createLocalAccount = async (ctx: Context): Promise<*> => {
 export const check = async (ctx: Context): Promise<*> => {
   if (!ctx.user) {
     ctx.status = 401;
-      return;
+    return;
   }
 
-  ctx.body = {
-    user: ctx.user,
-  };
+  try {
+    const now = new Date();
+    const user = await User.findById(ctx.user.id);
+    if (!user) {
+      ctx.cookies.set('access_token', null, {
+        domain: process.env.NODE_ENV === 'development'
+        ? undefined
+        : '.jaewoomade.com',
+      });
+      ctx.status = 401;
+      return;
+    }
+    const profile = await user.getProfile();
+    const data = {
+      id: user.id,
+      displayName: profile.display_name,
+      thumbnail: profile.thumbnail,
+      username: user.username,
+    };
+    if (ctx.tokenExpire - now < 1000 * 60 * 60 * 24 * 4) {
+      try {
+        const token = await user.generateToken();
+        ctx.cookies.set('access_token', token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+          domain: process.env.NODE_ENV === 'development'
+           ? undefined
+           : '.jaewoomade.com',
+        });
+      } catch (e) {
+        ctx.throw(500, e);
+      }
+    }
+    ctx.body = {
+      user: data,
+    };
+  } catch (e) {
+    ctx.throw(500, e);
+  }
 };
 
 export const logout = (ctx: Context) => {
