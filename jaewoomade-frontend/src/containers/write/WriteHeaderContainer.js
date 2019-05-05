@@ -9,6 +9,7 @@ import type { PostData } from 'store/modules/write';
 import queryString from 'query-string';
 import { compose } from 'redux';
 import { Prompt, withRouter } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 type Props = {
   title: string,
@@ -121,6 +122,11 @@ class WriteHeaderContainer extends Component<Props> {
     const { title, postData, writeExtraOpen } = this.props;
     return (
       <Fragment>
+        {title && (
+          <Helmet>
+            <title>{`(작성중) ${title} | JAEWOOMADE`}</title>
+          </Helmet>
+        )}
         <WriteHeader
           onOpenSubmitBox={onOpenSubmitBox}
           onChangeTitle={onChangeTitle}

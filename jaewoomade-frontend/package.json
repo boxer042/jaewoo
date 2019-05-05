@@ -57,6 +57,7 @@
     "react-icons": "^2.2.7",
     "react-onclickoutside": "6.7.1",
     "react-redux": "^5.0.7",
+    "react-router": "4.2.0",
     "react-router-dom": "^4.2.2",
     "react-tooltip": "^3.9.0",
     "redux": "^4.0.0",
@@ -77,6 +78,8 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
+    "build:server": "node scripts/build.server.js && copy ..\\jaewoomade-ssr\\src\\ssr\\render.js ..\\jaewoomade-ssr\\dist\\ssr\\render.js",
+    "build:server1": "node scripts/build.server.js",
     "test": "node scripts/test.js --env=jsdom",
     "deploy": "aws s3 sync ./build s3://cdn.jaewoomade.com/",
     "invalidate": "aws cloudfront create-invalidation --distribution-id E4SX87S87PXR8 --paths / /index.html /error.html /service-worker.js /manifest.json /favicon.ico"

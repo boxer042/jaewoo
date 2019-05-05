@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 const path = require('path');
@@ -53,4 +54,6 @@ module.exports = {
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
   styles: resolveApp('src/styles'),
+  ssrEntry: resolveApp('src/ssr.js'),
+  ssrBuild: resolveApp('../jaewoomade-ssr/src/ssr/'),
 };

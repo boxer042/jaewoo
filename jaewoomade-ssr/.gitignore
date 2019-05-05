@@ -1,0 +1,19 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
+dist
+dist/ssr/render.js
+src/ssr/render.js
+
+
+.env
+.env.production
+env.json
+
+asset-manifest.json

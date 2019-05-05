@@ -3,9 +3,17 @@ import { Route, Switch } from 'react-router-dom';
 import { Home, Register, Write, Post, User, Saves, Settings } from 'pages';
 import EmailLogin from 'containers/etc/EmailLogin';
 import Core from 'containers/base/Core';
+import { Helmet } from 'react-helmet';
 
 const App = () => (
   <React.Fragment>
+    <Helmet>
+      <title>JAEWOOMADE</title>
+      <meta
+        name="description"
+        content="공부공부공부"
+      />
+    </Helmet>
     <Switch>
       <Route exact path="/" component={Home} />
       <Route path="/(trending|recent|tags)" component={Home} />

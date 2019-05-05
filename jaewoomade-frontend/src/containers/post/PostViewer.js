@@ -8,6 +8,7 @@ import type { State } from 'store';
 import type { PostData, TocItem } from 'store/modules/posts';
 import PostToc from 'components/post/PostToc';
 import throttle from 'lodash/throttle';
+import { Helmet } from 'react-helmet';
 
 type Props = {
   username: ?string,
@@ -61,6 +62,10 @@ class PostViewer extends Component<Props> {
 
     return (
       <Fragment>
+        <Helmet>
+          <title>{post.title}</title>
+          <meta name="description" content="오잉" />
+        </Helmet>
         <PostToc
           toc={toc}
           activeHeading={activeHeading}

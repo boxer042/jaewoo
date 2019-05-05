@@ -13,7 +13,7 @@ const Write = () => {
   return (
     <WriteTemplate header={<WriteHeaderContainer />}>
       <Helmet>
-        <title>새 글 작성하기 | velog</title>
+        <title>새 글 작성하기 | JAEWOOMADE</title>
       </Helmet>
       <SubmitBoxContainer />
       <WriteExtraContainer />
